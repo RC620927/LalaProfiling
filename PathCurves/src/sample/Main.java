@@ -12,13 +12,14 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
     }
 
 
     public static void main(String[] args) {
-      Curve c = new Curve(10,90, 0, 10, true);
-    //    launch(args);
+
+     //   Curve c = new Curve(90, 40, 0, 60, true);
+        launch(args);
     }
 }
