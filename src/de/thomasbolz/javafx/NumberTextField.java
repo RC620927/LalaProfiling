@@ -21,30 +21,37 @@ import javafx.scene.control.TextField;
 public class NumberTextField extends TextField {
 
     private final NumberFormat nf;
-    private ObjectProperty<BigDecimal> number = new SimpleObjectProperty<>();
+    private ObjectProperty<Double> number = new SimpleObjectProperty<>();
 
-    public final BigDecimal getNumber() {
+    public final Double getNumber() {
         return number.get();
     }
 
-    public final void setNumber(BigDecimal value) {
+    public final void setNumber(Double value) {
         number.set(value);
     }
 
-    public ObjectProperty<BigDecimal> numberProperty() {
+    public ObjectProperty<Double> numberProperty() {
         return number;
     }
 
     public NumberTextField() {
-        this(BigDecimal.ZERO);
+        this(0.0);
     }
 
-    public NumberTextField(BigDecimal value) {
+    public NumberTextField(Double value) {
         this(value, NumberFormat.getInstance());
         initHandlers();
     }
 
-    public NumberTextField(BigDecimal value, NumberFormat nf) {
+    Double min, max;
+    public NumberTextField(Double value, NumberFormat nf, Double min, Double max){
+        this(value, nf);
+        this.min = min;
+        this.max = max;
+    }
+
+    public NumberTextField(Double value, NumberFormat nf) {
         super();
         this.nf = nf;
         initHandlers();
@@ -73,10 +80,10 @@ public class NumberTextField extends TextField {
         });
 
         // Set text in field if BigDecimal property is changed from outside.
-        numberProperty().addListener(new ChangeListener<BigDecimal>() {
+        numberProperty().addListener(new ChangeListener<Double>() {
 
             @Override
-            public void changed(ObservableValue<? extends BigDecimal> obserable, BigDecimal oldValue, BigDecimal newValue) {
+            public void changed(ObservableValue<? extends Double> obserable, Double oldValue, Double newValue) {
                 setText(nf.format(newValue));
             }
         });
@@ -93,8 +100,12 @@ public class NumberTextField extends TextField {
                 return;
             }
             Number parsedNumber = nf.parse(input);
-            BigDecimal newValue = new BigDecimal(parsedNumber.toString());
-            setNumber(newValue);
+            Double newValue = new Double(parsedNumber.toString());
+            if(min !=null && max !=null){
+                setNumber(Math.min(Math.max(min, newValue), max));
+            }else{
+                setNumber(newValue);
+            }
             selectAll();
         } catch (ParseException ex) {
             // If parsing fails keep old number
