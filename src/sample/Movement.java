@@ -20,6 +20,8 @@ public interface Movement {
 
     Point2D getStartPoint();
 
+    double getInitialAngle();
+
     void setStartPoint(Point2D startPoint);
 
     void update();

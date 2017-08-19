@@ -22,6 +22,8 @@ public class MockBotBuild {
     private double startingAngle;
     private MockBotView mockBotView;
 
+
+
     public MockBotBuild(Point2D startingPoint, double startingAngle){
         mockBots = new ArrayList<>();
 
@@ -168,6 +170,11 @@ public class MockBotBuild {
         int index =1;
         for(MockBot mb : mockBots){
             mb.setPosition(index++);
+            if(mockBotView!=null){
+                mb.setZoom(mockBotView.getZoom());
+                mb.setScrollY(mockBotView.getScrollY());
+                mb.setScrollX(mockBotView.getScrollX());
+            }
         }
 
         if(mockBotView!=null){

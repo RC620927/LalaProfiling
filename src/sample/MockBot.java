@@ -43,6 +43,8 @@ public class MockBot {
 
     boolean running;
 
+    private double scrollX,scrollY,zoom;
+
     public MockBot(Image image, Movement movement, MovementType mt) {
         this.image = image;
         this.snapshots = movement.getSnapshots();
@@ -52,6 +54,8 @@ public class MockBot {
         setVisibility(false);
         running=false;
         position=0;
+        scrollX=0;
+        scrollY=0;
     }
 
     public MockBot(Movement movement, MovementType mt) {
@@ -61,6 +65,8 @@ public class MockBot {
         this.mt = mt;
         setVisibility(false);
         running=false;
+        scrollX = 0;
+        scrollY = 0;
     }
 
     public int getPosition() {
@@ -90,10 +96,10 @@ public class MockBot {
 
                     for (Snapshot s: snapshots){
                         botNode.setRotate(s.angle);
-                        botNode.setTranslateX(  s.x - botNode.getBoundsInLocal().getWidth()/2);
-                        botNode.setTranslateY(500- s.y - botNode.getBoundsInLocal().getHeight()/2);
-                        guideNode.setTranslateX(  s.x );
-                        guideNode.setTranslateY(500- s.y );
+                        botNode.setTranslateX(scrollX + (zoom * s.x - botNode.getBoundsInLocal().getWidth()/2));
+                        botNode.setTranslateY(500- scrollY - (zoom *s.y + botNode.getBoundsInLocal().getHeight()/2));
+                        guideNode.setTranslateX( zoom * s.x );
+                        guideNode.setTranslateY(500- (zoom*s.y) );
 
                         try {
                             Thread.sleep(1000/Movement.refreshRate);
@@ -111,8 +117,8 @@ public class MockBot {
                 public void run(){
                     for (Snapshot s: snapshots){
                         botNode.setRotate(s.angle);
-                        botNode.setTranslateX(s.x - botNode.getBoundsInLocal().getWidth()/2);
-                        botNode.setTranslateY(500-s.y - botNode.getBoundsInLocal().getWidth()/2);
+                        botNode.setTranslateX(scrollX + (zoom*s.x - botNode.getBoundsInLocal().getWidth()/2));
+                        botNode.setTranslateY(500- scrollY - (zoom*s.y +  botNode.getBoundsInLocal().getHeight()/2));
                         try {
                             Thread.sleep(1000/Movement.refreshRate);
                         } catch (InterruptedException e) {
@@ -140,5 +146,19 @@ public class MockBot {
 
     public MovementType getMt() {
         return mt;
+    }
+
+    public void setScrollX(double scrollX) {
+        this.scrollX = scrollX;
+    }
+
+    public void setScrollY(double scrollY) {
+        this.scrollY = scrollY;
+    }
+
+    public void setZoom(double zoom) {
+        this.getBotNode().setScaleY(zoom);
+        this.getBotNode().setScaleX(zoom);
+        this.zoom = zoom;
     }
 }

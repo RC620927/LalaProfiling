@@ -83,14 +83,26 @@ public class Controller {
     @FXML
     public ChoiceBox<String> movementTypeChooser;
 
+    @FXML
+    public ScrollBar scrollBarX;
+
+    @FXML
+    public ScrollBar scrollBarY;
+
+    @FXML
+    public RadioMenuItem zoom25,zoom50,zoom75,zoom100,zoom125,zoom150;
+
 
     public NumberSpinner initialX,initialY, endingX,endingY, distance, initialAngle, endingAngle, initialSpeed,endingSpeed,topSpeed,fudge1,fudge2;
 
 
 
 
+    boolean key = false;
     @FXML
     public void initialize(){
+
+
 
         ToggleGroup directionTG = new ToggleGroup();
         directionTG.getToggles().add(reverseRadioButton);
@@ -127,16 +139,99 @@ public class Controller {
         fudgeHBox.getChildren().addAll(fudge1,fudge2);
 
 
+        //setup ChoiceBox
+        movementTypeChooser.getItems().addAll("Line", "Bezier Curve", "Turn");
+        movementTypeChooser.setValue("Line");
+
+        //blackout boxes not necessary
+        fudge1.setDisable(true);
+        fudge2.setDisable(true);
+        initialX.setDisable(true);
+        initialY.setDisable(true);
+        endingX.setDisable(true);
+        endingY.setDisable(true);
+        distance.setDisable(false);
+        endingAngle.setDisable(true);
+        initialAngle.setDisable(true);
+        movementTypeChooser.setOnAction(e->{
+            switch (movementTypeChooser.getSelectionModel().getSelectedItem()){
+                case "Line":
+                    fudge1.setDisable(true);
+                    fudge2.setDisable(true);
+                    initialX.setDisable(true);
+                    initialY.setDisable(true);
+                    endingX.setDisable(true);
+                    endingY.setDisable(true);
+                    distance.setDisable(false);
+                    endingAngle.setDisable(true);
+                    initialAngle.setDisable(true);
+
+                    break;
+                case "Turn":
+                    fudge1.setDisable(true);
+                    fudge2.setDisable(true);
+                    initialX.setDisable(true);
+                    initialY.setDisable(true);
+                    endingX.setDisable(true);
+                    endingY.setDisable(true);
+                    distance.setDisable(true);
+                    endingAngle.setDisable(false);
+                    initialAngle.setDisable(true);
+                    break;
+                case "Bezier Curve":
+                    fudge1.setDisable(false);
+                    fudge2.setDisable(false);
+                    initialX.setDisable(true);
+                    initialY.setDisable(true);
+                    endingX.setDisable(false);
+                    endingY.setDisable(false);
+                    distance.setDisable(true);
+                    endingAngle.setDisable(false);
+                    initialAngle.setDisable(true);
+                    break;
+            }
+        });
+
         endingX.numberProperty().addListener(new ChangeListener<Double>() {
             @Override
             public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
-                distance.setNumber(Math.sqrt(newValue*newValue + Math.pow(endingY.getNumber(),2)));
+
+                if (oldValue != newValue && !key) {
+                    key=true;
+                    double delX = newValue-initialX.getNumber();
+                    double delY = endingY.getNumber()-initialY.getNumber();
+                    distance.setNumber(Math.sqrt(delX * delX + Math.pow(delY, 2)));
+                    key=false;
+                }
+
             }
         });
         endingY.numberProperty().addListener(new ChangeListener<Double>() {
             @Override
             public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
-                distance.setNumber(Math.sqrt(newValue*newValue + Math.pow(endingX.getNumber(),2)));
+
+                if (newValue != oldValue && !key) {
+                    key=true;
+                    double delX = endingX.getNumber()-initialX.getNumber();
+                    double delY = newValue-initialY.getNumber();
+                    distance.setNumber(Math.sqrt(delX * delX + Math.pow(delY, 2)));
+
+                    key=false;
+                }
+            }
+        });
+        distance.numberProperty().addListener(new ChangeListener<Double>() {
+            @Override
+            public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
+
+                if (oldValue != newValue&&!key) {
+                    key=true;
+                    double theta = endingAngle.getNumber();
+                    endingX.setNumber(Math.sin(theta) * newValue);
+                    endingY.setNumber(Math.cos(theta) * newValue);
+                    key=false;
+                }
+
             }
         });
 
@@ -154,15 +249,22 @@ public class Controller {
         mockBotBuild.addTurn(0);
         mockBotBuild.addLine(80);
         MockBotView mockBotView = new MockBotView(mockBotBuild);
+        mockBotView.setScaleX(1);
+        mockBotView.setScaleY(1);
         mockBotView.setStyle("-fx-background-color: #2f4f4f");
+        mockBotView.setZoom(1);
 
         //setup mock bots list view
         movementsVBox.getChildren().add(mockBotView.getMockBotListView());
+        mockBotView.getMockBotListView().setOnMouseClicked(e->{
+            mockBotView.getMockBotListView().onMouseClicked();
+            setValues(mockBotView.getMockBotListView().getSelectionModel().getSelectedItem());
+            System.out.println("AFTER");
+        });
 
-        //setup ChoiceBox
-        movementTypeChooser.getItems().addAll("Line", "Bezier Curve", "Turn");
-        movementTypeChooser.setValue("Line");
         layoutAnchorPane.getChildren().add(mockBotView);
+        layoutAnchorPane.getChildren().add(mockBotView.getMockBotDotsViewer());
+
 
         //setup table
 
@@ -171,10 +273,48 @@ public class Controller {
         });
 
         newButton.setOnAction(e->{
+            /*
             GUIInteractions.addToMockBuild(mockBotBuild,movementTypeChooser.getValue(),
                     new Point2D.Double(endingX.getNumber(),endingY.getNumber()),distance.getNumber(),
-                    endingAngle.getNumber(),fudge1.getNumber(),fudge2.getNumber());
+                    endingAngle.getNumber(),fudge1.getNumber(),fudge2.getNumber());*/
+            mockBotBuild.addLine(10);
         });
+
+        ToggleGroup zoomToggle = new ToggleGroup();
+        zoom25.setOnAction(e->{mockBotView.setZoom(0.25);});
+        zoom25.setToggleGroup(zoomToggle);
+        zoom50.setOnAction(e->{mockBotView.setZoom(0.5);});
+        zoom50.setToggleGroup(zoomToggle);
+        zoom75.setOnAction(e->{mockBotView.setZoom(0.75);});
+        zoom75.setToggleGroup(zoomToggle);
+        zoom100.setOnAction(e->{mockBotView.setZoom(1);});
+        zoom100.setToggleGroup(zoomToggle);
+        zoom125.setOnAction(e->{mockBotView.setZoom(1.25);});
+        zoom125.setToggleGroup(zoomToggle);
+        zoom150.setOnAction(e->{mockBotView.setZoom(1.5);});
+        zoom150.setToggleGroup(zoomToggle);
+    }
+
+    public void setValues(MockBot mb){
+        this.initialX.setNumber(mb.getMovement().getStartPoint().getX());
+        this.initialY.setNumber(mb.getMovement().getStartPoint().getY());
+        this.endingX.setNumber(mb.getMovement().getEndPoint().getX());
+        this.endingY.setNumber(mb.getMovement().getEndPoint().getY());
+        this.initialAngle.setNumber(mb.getMovement().getInitialAngle());
+        this.endingAngle.setNumber(mb.getMovement().getEndAngle());
+        if(mb.getMt()== MockBot.MovementType.BEZIERCURVE){
+            this.fudge1.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge1());
+            this.fudge2.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge2());
+            movementTypeChooser.setValue("Bezier Curve");
+        }else{
+            if(mb.getMt() == MockBot.MovementType.LINE){
+                movementTypeChooser.setValue("Line");
+            }else{
+                movementTypeChooser.setValue("Turn");
+            }
+            fudge1.setNumber(0.0);
+            fudge2.setNumber(0.0);
+        }
 
 
     }

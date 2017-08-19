@@ -95,4 +95,9 @@ public class RotateMovement implements Movement {
     public double getEndAngle() {
         return endAngle;
     }
+
+    @Override
+    public double getInitialAngle() {
+        return initialAngle;
+    }
 }

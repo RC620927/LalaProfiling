@@ -85,4 +85,9 @@ public class LineMovement implements Movement {
     public double getEndAngle() {
         return initialAngle;
     }
+
+    @Override
+    public double getInitialAngle() {
+        return initialAngle;
+    }
 }

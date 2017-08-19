@@ -115,4 +115,16 @@ public class BezierCurveMovement implements Movement {
     public double getEndAngle() {
         return endingAngle;
     }
+
+    public double getInitialAngle() {
+        return initialAngle;
+    }
+
+    public double getFudge1() {
+        return fudge1;
+    }
+
+    public double getFudge2() {
+        return fudge2;
+    }
 }
