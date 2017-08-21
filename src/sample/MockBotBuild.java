@@ -6,6 +6,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableObjectValue;
 import javafx.beans.value.ObservableValue;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 
 import java.awt.geom.Point2D;
@@ -31,7 +33,7 @@ public class MockBotBuild {
         this.startingAngle = startingAngle;
     }
 
-    public void addLine(double distance){
+    public void addLine(double distance, boolean reverse){
         double pastAngle, startX, startY;
         if(mockBots.isEmpty()){
             pastAngle = startingAngle;
@@ -49,7 +51,7 @@ public class MockBotBuild {
         double endY = startY +
                 Math.cos(Math.toRadians(pastAngle)) * distance;
 
-        LineMovement lm = new LineMovement(new Point2D.Double(startX,startY), new Point2D.Double(endX,endY), distance/160);
+        LineMovement lm = new LineMovement(new Point2D.Double(startX,startY), new Point2D.Double(endX,endY),reverse, distance/160);
         MockBot mb = new MockBot(new Image("RobotPicture.png"), lm, MockBot.MovementType.LINE);
         mockBots.add(mb);
         if(mockBotView!=null){mockBotView.getChildren().add(mb.getBotNode());}
@@ -57,7 +59,7 @@ public class MockBotBuild {
     }
 
     //add a line, but if endpoint with angle does not quite align, then rotate first.
-    public void addLine(Point2D endPoint){
+    public void addLine(Point2D endPoint, boolean reverse){
         double pastAngle, startX, startY;
         if(mockBots.isEmpty()){
             pastAngle = startingAngle;
@@ -87,7 +89,7 @@ public class MockBotBuild {
             if(mockBotView!=null){mockBotView.getChildren().add(mb1.getBotNode());}
         }
 
-        LineMovement lm = new LineMovement(new Point2D.Double(startX,startY), new Point2D.Double(endX,endY), distance/160);
+        LineMovement lm = new LineMovement(new Point2D.Double(startX,startY), new Point2D.Double(endX,endY), reverse, distance/160);
         MockBot mb2 = new MockBot(new Image("RobotPicture.png"), lm, MockBot.MovementType.LINE);
         mockBots.add(mb2);
         if(mockBotView!=null){mockBotView.getChildren().add(mb2.getBotNode());}
@@ -122,7 +124,7 @@ public class MockBotBuild {
     }
 
 
-    public void addBezierCurve(Point2D endPoint, double endingAngle, double fudge1, double fudge2){
+    public void addBezierCurve(Point2D endPoint, double endingAngle, double fudge1, double fudge2, boolean reverse){
         double pastAngle, startX, startY;
         if(mockBots.isEmpty()){
             pastAngle = startingAngle;
@@ -140,7 +142,7 @@ public class MockBotBuild {
         double distance = Math.hypot(endX-startX, endY-startY);
 
         BezierCurveMovement bcm = new BezierCurveMovement(mockBots.get(mockBots.size()-1).getMovement().getEndPoint(),
-                endPoint, pastAngle, endingAngle, fudge1, fudge2, distance/120 );
+                endPoint, pastAngle, endingAngle, fudge1, fudge2, reverse, distance/120 );
         MockBot mb = new MockBot(new Image("RobotPicture.png"), bcm, MockBot.MovementType.BEZIERCURVE);
         mockBots.add(mb);
         if(mockBotView!=null){mockBotView.getChildren().add(mb.getBotNode());}
@@ -151,7 +153,8 @@ public class MockBotBuild {
 
     }
     public void remove(MockBot mb){
-
+        this.mockBots.remove(mb);
+        updateStarts();
     }
 
     public ArrayList<MockBot> getMockBots(){
@@ -169,18 +172,47 @@ public class MockBotBuild {
     public void update(){
         int index =1;
         for(MockBot mb : mockBots){
-            mb.setPosition(index++);
+            mb.setPosition(index);
             if(mockBotView!=null){
                 mb.setZoom(mockBotView.getZoom());
                 mb.setScrollY(mockBotView.getScrollY());
                 mb.setScrollX(mockBotView.getScrollX());
             }
+
+
+            index++;
         }
 
         if(mockBotView!=null){
             mockBotView.getMockBotListView().update();
             mockBotView.getMockBotDotsViewer().update();
         }
+    }
+
+    public void updateStarts(){
+        int index =1;
+        for(MockBot mb : mockBots){
+            mb.setPosition(index);
+            if(mockBotView!=null){
+
+                if(index==1){
+                    mb.getMovement().setStartPoint(startingPoint);
+                    mb.getMovement().setInitialAngle(startingAngle);
+                    mb.update();
+                }else{
+                    mb.getMovement().setStartPoint(mockBots.get(index-2).getMovement().getEndPoint());
+                    mb.getMovement().setInitialAngle(mockBots.get(index-2).getMovement().getEndAngle());
+                    mb.update();
+                }
+            }
+            index++;
+        }
+        if(mockBotView!=null){
+            mockBotView.getMockBotListView().update();
+            mockBotView.getMockBotDotsViewer().update();
+        }
+
+
     }
 
 }

@@ -81,9 +81,6 @@ public class Controller {
     public Group viewGroup;
 
     @FXML
-    public ChoiceBox<String> movementTypeChooser;
-
-    @FXML
     public ScrollBar scrollBarX;
 
     @FXML
@@ -97,8 +94,13 @@ public class Controller {
 
 
 
+    MockBotView mockBotView;
+    MockBotBuild mockBotBuild;
+
+    MockBot.MovementType movementType;
 
     boolean key = false;
+    boolean togglerKey =false;
     @FXML
     public void initialize(){
 
@@ -139,9 +141,6 @@ public class Controller {
         fudgeHBox.getChildren().addAll(fudge1,fudge2);
 
 
-        //setup ChoiceBox
-        movementTypeChooser.getItems().addAll("Line", "Bezier Curve", "Turn");
-        movementTypeChooser.setValue("Line");
 
         //blackout boxes not necessary
         fudge1.setDisable(true);
@@ -153,56 +152,40 @@ public class Controller {
         distance.setDisable(false);
         endingAngle.setDisable(true);
         initialAngle.setDisable(true);
-        movementTypeChooser.setOnAction(e->{
-            switch (movementTypeChooser.getSelectionModel().getSelectedItem()){
-                case "Line":
-                    fudge1.setDisable(true);
-                    fudge2.setDisable(true);
-                    initialX.setDisable(true);
-                    initialY.setDisable(true);
-                    endingX.setDisable(true);
-                    endingY.setDisable(true);
-                    distance.setDisable(false);
-                    endingAngle.setDisable(true);
-                    initialAngle.setDisable(true);
 
-                    break;
-                case "Turn":
-                    fudge1.setDisable(true);
-                    fudge2.setDisable(true);
-                    initialX.setDisable(true);
-                    initialY.setDisable(true);
-                    endingX.setDisable(true);
-                    endingY.setDisable(true);
-                    distance.setDisable(true);
-                    endingAngle.setDisable(false);
-                    initialAngle.setDisable(true);
-                    break;
-                case "Bezier Curve":
-                    fudge1.setDisable(false);
-                    fudge2.setDisable(false);
-                    initialX.setDisable(true);
-                    initialY.setDisable(true);
-                    endingX.setDisable(false);
-                    endingY.setDisable(false);
-                    distance.setDisable(true);
-                    endingAngle.setDisable(false);
-                    initialAngle.setDisable(true);
-                    break;
-            }
-        });
 
+        //setup Mock bots
+        mockBotBuild= new MockBotBuild(new Point2D.Double(200,0), 0);
+        mockBotBuild.addLine(200,false);
+/*
+        mockBotBuild.addBezierCurve(new Point2D.Double(400,120), 270, 150,100,true);
+
+        mockBotBuild.addTurn(180);
+        mockBotBuild.addLine(120, false);
+
+        mockBotBuild.addBezierCurve(new Point2D.Double(200,120), 90, 150,100,true);
+        mockBotBuild.addTurn(0);
+        mockBotBuild.addLine(80,false);
+        */
+        mockBotView = new MockBotView(mockBotBuild);
+        mockBotView.setScaleX(1);
+        mockBotView.setScaleY(1);
+        mockBotView.setStyle("-fx-background-color: #2f4f4f");
+        mockBotView.setZoom(1);
+
+        //setup listeners
         endingX.numberProperty().addListener(new ChangeListener<Double>() {
             @Override
             public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
-
                 if (oldValue != newValue && !key) {
                     key=true;
                     double delX = newValue-initialX.getNumber();
                     double delY = endingY.getNumber()-initialY.getNumber();
                     distance.setNumber(Math.sqrt(delX * delX + Math.pow(delY, 2)));
+                    modifySelectedMockBot();
                     key=false;
                 }
+
 
             }
         });
@@ -215,7 +198,7 @@ public class Controller {
                     double delX = endingX.getNumber()-initialX.getNumber();
                     double delY = newValue-initialY.getNumber();
                     distance.setNumber(Math.sqrt(delX * delX + Math.pow(delY, 2)));
-
+                    modifySelectedMockBot();
                     key=false;
                 }
             }
@@ -227,38 +210,65 @@ public class Controller {
                 if (oldValue != newValue&&!key) {
                     key=true;
                     double theta = endingAngle.getNumber();
-                    endingX.setNumber(Math.sin(theta) * newValue);
-                    endingY.setNumber(Math.cos(theta) * newValue);
+                    endingX.setNumber(Math.sin(Math.toRadians(theta)) * newValue + initialX.getNumber());
+                    endingY.setNumber(Math.cos(Math.toRadians(theta)) * newValue + initialY.getNumber());
+                    modifySelectedMockBot();
                     key=false;
                 }
 
             }
         });
 
+        endingAngle.numberProperty().addListener(new ChangeListener<Double>() {
+            @Override
+            public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
+                if(oldValue!=newValue && !key){
+                    key=true;
+                    modifySelectedMockBot();
+                    key=false;
+                }
+            }
+        });
+        fudge1.numberProperty().addListener(new ChangeListener<Double>() {
+            @Override
+            public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
+                if(oldValue!=newValue && !key){
+                    key=true;
+                    modifySelectedMockBot();
+                    key=false;
+                }
+            }
+        });
+        fudge2.numberProperty().addListener(new ChangeListener<Double>() {
+            @Override
+            public void changed(ObservableValue<? extends Double> observable, Double oldValue, Double newValue) {
+                if(oldValue!=newValue && !key){
+                    key=true;
+                    modifySelectedMockBot();
+                    key=false;
+                }
+            }
+        });
+        forwardsRadioButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(oldValue!=newValue && !key){
+                    key=true;
+                    modifySelectedMockBot();
+                    key=false;
+                    System.out.println("FORWARDSSs");
+                }
+            }
+        });
 
-        //setup Mock bots
-        MockBotBuild mockBotBuild= new MockBotBuild(new Point2D.Double(200,0), 0);
-        mockBotBuild.addLine(200);
-        mockBotBuild.addTurn(180);
-        mockBotBuild.addBezierCurve(new Point2D.Double(400,120), 90, 150,100);
-
-        mockBotBuild.addTurn(180);
-        mockBotBuild.addLine(120);
-        mockBotBuild.addTurn(0);
-        mockBotBuild.addBezierCurve(new Point2D.Double(200,120), 270, 150,100);
-        mockBotBuild.addTurn(0);
-        mockBotBuild.addLine(80);
-        MockBotView mockBotView = new MockBotView(mockBotBuild);
-        mockBotView.setScaleX(1);
-        mockBotView.setScaleY(1);
-        mockBotView.setStyle("-fx-background-color: #2f4f4f");
-        mockBotView.setZoom(1);
 
         //setup mock bots list view
         movementsVBox.getChildren().add(mockBotView.getMockBotListView());
         mockBotView.getMockBotListView().setOnMouseClicked(e->{
             mockBotView.getMockBotListView().onMouseClicked();
+            key=true;
             setValues(mockBotView.getMockBotListView().getSelectionModel().getSelectedItem());
+            key=false;
             System.out.println("AFTER");
         });
 
@@ -272,12 +282,19 @@ public class Controller {
             mockBotView.play();
         });
 
+        deleteButton.setOnAction(e->{
+            deleteSelectedMockBot();
+        });
+
+
+        NewMovementWindow nmw = new NewMovementWindow(mockBotBuild);
         newButton.setOnAction(e->{
             /*
             GUIInteractions.addToMockBuild(mockBotBuild,movementTypeChooser.getValue(),
                     new Point2D.Double(endingX.getNumber(),endingY.getNumber()),distance.getNumber(),
                     endingAngle.getNumber(),fudge1.getNumber(),fudge2.getNumber());*/
-            mockBotBuild.addLine(10);
+            //mockBotBuild.addLine(10,false);
+            nmw.use();
         });
 
         ToggleGroup zoomToggle = new ToggleGroup();
@@ -296,29 +313,109 @@ public class Controller {
     }
 
     public void setValues(MockBot mb){
+        togglerKey = true;
         this.initialX.setNumber(mb.getMovement().getStartPoint().getX());
         this.initialY.setNumber(mb.getMovement().getStartPoint().getY());
         this.endingX.setNumber(mb.getMovement().getEndPoint().getX());
         this.endingY.setNumber(mb.getMovement().getEndPoint().getY());
+        double delX = endingX.getNumber() -initialX.getNumber();
+        double delY = endingY.getNumber()-initialY.getNumber();
+        this.distance.setNumber(Math.sqrt(delX * delX + Math.pow(delY, 2)));
         this.initialAngle.setNumber(mb.getMovement().getInitialAngle());
         this.endingAngle.setNumber(mb.getMovement().getEndAngle());
+        if(mb.getMovement().getReverse()){
+            this.reverseRadioButton.selectedProperty().set(true);
+        }else{
+            this.forwardsRadioButton.selectedProperty().set(true);
+        }
         if(mb.getMt()== MockBot.MovementType.BEZIERCURVE){
             this.fudge1.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge1());
             this.fudge2.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge2());
-            movementTypeChooser.setValue("Bezier Curve");
+            toggleBCBoxes();
+
+            System.out.println("BC");
         }else{
             if(mb.getMt() == MockBot.MovementType.LINE){
-                movementTypeChooser.setValue("Line");
+
+                toggleLineBoxes();
+                System.out.println("Line");
             }else{
-                movementTypeChooser.setValue("Turn");
+
+                toggleTurnBoxes();
+                System.out.println("Turn");
             }
             fudge1.setNumber(0.0);
             fudge2.setNumber(0.0);
+            togglerKey=false;
         }
 
 
     }
 
+    private void toggleLineBoxes(){
+        fudge1.setDisable(true);
+        fudge2.setDisable(true);
+        initialX.setDisable(true);
+        initialY.setDisable(true);
+        endingX.setDisable(true);
+        endingY.setDisable(true);
+        distance.setDisable(false);
+        endingAngle.setDisable(true);
+        initialAngle.setDisable(true);
+        System.out.println("LINEFR");
+    }
+    private void toggleBCBoxes(){
+        fudge1.setDisable(false);
+        fudge2.setDisable(false);
+        initialX.setDisable(true);
+        initialY.setDisable(true);
+        endingX.setDisable(false);
+        endingY.setDisable(false);
+        distance.setDisable(true);
+        endingAngle.setDisable(false);
+        initialAngle.setDisable(true);
+        System.out.println("BCFR");
+    }
+    private void toggleTurnBoxes(){
+        fudge1.setDisable(true);
+        fudge2.setDisable(true);
+        initialX.setDisable(true);
+        initialY.setDisable(true);
+        endingX.setDisable(true);
+        endingY.setDisable(true);
+        distance.setDisable(true);
+        endingAngle.setDisable(false);
+        initialAngle.setDisable(true);
+        System.out.println("TURNFR");
+    }
 
+    private void modifySelectedMockBot(){
+        if(mockBotView!=null){
+            MockBot selected = mockBotView.getMockBotListView().getSelectionModel().getSelectedItem();
+            if(selected!=null) {
+                if(selected.getMt() == MockBot.MovementType.BEZIERCURVE){
+                    ((BezierCurveMovement) selected.getMovement()).setEndingAngle(endingAngle.getNumber());
+                    ((BezierCurveMovement) selected.getMovement()).setEndPoint(new Point2D.Double(endingX.getNumber(),endingY.getNumber()));
+                    ((BezierCurveMovement) selected.getMovement()).setFudge1(fudge1.getNumber());
+                    ((BezierCurveMovement) selected.getMovement()).setFudge2(fudge2.getNumber());
+
+                }else if(selected.getMt() == MockBot.MovementType.LINE){
+                    ((LineMovement) selected.getMovement()).setEndPoint(new Point2D.Double(endingX.getNumber(),endingY.getNumber()));
+                }else if(selected.getMt() == MockBot.MovementType.ROTATE){
+                    ((RotateMovement) selected.getMovement()).setEndAngle(endingAngle.getNumber());
+                }
+                selected.getMovement().setReverse(reverseRadioButton.selectedProperty().getValue());
+                selected.update();
+                mockBotBuild.updateStarts();
+            }
+        }
+    }
+
+    private void deleteSelectedMockBot(){
+        if(mockBotView!=null){
+            MockBot selected = mockBotView.getMockBotListView().getSelectionModel().getSelectedItem();
+            mockBotBuild.remove(selected);
+        }
+    }
 
 }

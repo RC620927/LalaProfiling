@@ -16,6 +16,7 @@ public class RotateMovement implements Movement {
 
     double detail;
     Point2D endPoint, startPoint;
+    boolean reverse;
 
     double initialAngle, endAngle;
 
@@ -99,5 +100,31 @@ public class RotateMovement implements Movement {
     @Override
     public double getInitialAngle() {
         return initialAngle;
+    }
+
+    public void setInitialAngle(double initialAngle) {
+        this.initialAngle = initialAngle;
+        autoDetail();
+        update();
+    }
+
+    public void setEndAngle(double endAngle) {
+        this.endAngle = endAngle;
+        autoDetail();
+        update();
+    }
+
+
+    public boolean getReverse() {
+        return reverse;
+    }
+
+    @Override
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
+    }
+
+    private void autoDetail(){
+        setDetail(Math.abs(RotateMovement.getChangeTheta(getEndAngle(),getInitialAngle()))/200);
     }
 }

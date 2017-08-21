@@ -11,10 +11,10 @@ public class GUIInteractions {
                                  Double distance, Double endingAngle, Double fudge1, Double fudge2){
         switch(movementType){
             case "Line":
-                mbb.addLine(distance);
+                mbb.addLine(distance,false);
                 break;
             case "Bezier Curve":
-                mbb.addBezierCurve(endPoint,endingAngle,fudge1,fudge2);
+                mbb.addBezierCurve(endPoint,endingAngle,fudge1,fudge2,false);
                 break;
             case "Turn":
                 mbb.addTurn(endingAngle);

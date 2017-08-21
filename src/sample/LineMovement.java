@@ -12,14 +12,16 @@ public class LineMovement implements Movement {
     Point2D endPoint, startPoint;
     double initialAngle;
     double detail;
+    boolean reverse;
 
 
     private ArrayList<Snapshot> robotSnapshots;
 
-    public LineMovement(Point2D startPoint, Point2D endPoint, double detail) {
+    public LineMovement(Point2D startPoint, Point2D endPoint, boolean reverse, double detail) {
         this.endPoint = endPoint;
         this.startPoint = startPoint;
         this.detail = detail;
+        this.reverse=reverse;
         update();
 
     }
@@ -42,6 +44,7 @@ public class LineMovement implements Movement {
 
     public void setEndPoint(Point2D endPoint){
         this.endPoint = endPoint;
+        autoDetail();
         update();
     }
 
@@ -53,8 +56,10 @@ public class LineMovement implements Movement {
     @Override
     public void setStartPoint(Point2D startPoint) {
         this.startPoint=startPoint;
+        autoDetail();
         update();
     }
+
 
     @Override
     public void update() {
@@ -63,6 +68,10 @@ public class LineMovement implements Movement {
         initialAngle = Math.toRadians(90) - initialAngle;
         initialAngle = Math.toDegrees(initialAngle);
         initialAngle = (endPoint.getX() - startPoint.getX()) <0 ? initialAngle + 180 : initialAngle;
+        if(reverse){
+            initialAngle+=180;
+            initialAngle%=360;
+        }
 
 
         robotSnapshots = new ArrayList<>();
@@ -70,10 +79,11 @@ public class LineMovement implements Movement {
         double delX = (endPoint.getX() - startPoint.getX()) / snapshotCount;
         double delY = (endPoint.getY() - startPoint.getY()) / snapshotCount;
         for(int i = 0; i<snapshotCount;i++){
-            double x = startPoint.getX() + ((i+1) * delX);
-            double y = startPoint.getY() + ((i+1) * delY);
+            double x = startPoint.getX() + ((i) * delX);
+            double y = startPoint.getY() + ((i) * delY);
             robotSnapshots.add(i, new Snapshot(x,y,initialAngle));
         }
+        int a =0;
     }
 
     @Override
@@ -89,5 +99,30 @@ public class LineMovement implements Movement {
     @Override
     public double getInitialAngle() {
         return initialAngle;
+    }
+
+
+    public void setInitialAngle(double initialAngle){
+
+    }
+
+    public boolean getReverse() {
+        return reverse;
+    }
+
+    public void setReverse(boolean reverse) {
+        if(reverse!=this.reverse){
+            double delX = (endPoint.getX() - startPoint.getX());
+            double delY = (endPoint.getY() - startPoint.getY());
+            endPoint = new Point2D.Double(startPoint.getX()-delX,startPoint.getY()-delY);
+            this.reverse = reverse;
+            update();
+        }
+
+
+    }
+
+    private void autoDetail(){
+        setDetail(Math.hypot(endPoint.getX()-getStartPoint().getX(), endPoint.getY()-getStartPoint().getY())/160);
     }
 }

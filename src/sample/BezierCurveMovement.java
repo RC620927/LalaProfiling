@@ -14,32 +14,47 @@ public class BezierCurveMovement implements Movement {
     private Point2D initialPoint, endPoint, controlPoint1,controlPoint2;
     private double detail;
     private ArrayList<Snapshot> robotSnapshots;
+    private boolean reverse;
 
 
     private double initialAngle, endingAngle, fudge1,fudge2;
     private ArrayList<Snapshot> snapshots;
 
     public BezierCurveMovement(Point2D initialPoint, Point2D endPoint,  double initialAngle,
-                               double endingAngle, double fudge1, double fudge2, double detail) {
+                               double endingAngle, double fudge1, double fudge2, boolean reverse, double detail) {
         this.initialPoint = initialPoint;
         this.endPoint = endPoint;
         this.initialAngle = initialAngle;
         this.endingAngle = endingAngle;
         this.detail = detail;
-        controlPoint1 = new Point2D.Double(initialPoint.getX() + Math.sin(Math.toRadians(initialAngle)) * fudge1,
-                initialPoint.getY() + Math.cos(Math.toRadians(initialAngle)) * fudge1);
-        controlPoint2 = new Point2D.Double(endPoint.getX() - Math.sin(Math.toRadians(endingAngle)) * fudge2,
-                endPoint.getY() - Math.cos(Math.toRadians(endingAngle)) * fudge2);
+        this.fudge1=fudge1;
+        this.fudge2=fudge2;
+        this.reverse=reverse;
+        if(!reverse){
+            controlPoint1 = new Point2D.Double(initialPoint.getX() + Math.sin(Math.toRadians(initialAngle)) * fudge1,
+                    initialPoint.getY() + Math.cos(Math.toRadians(initialAngle)) * fudge1);
+            controlPoint2 = new Point2D.Double(endPoint.getX() - Math.sin(Math.toRadians(endingAngle)) * fudge2,
+                    endPoint.getY() - Math.cos(Math.toRadians(endingAngle)) * fudge2);
+        }else{
+            controlPoint1 = new Point2D.Double(initialPoint.getX() - Math.sin(Math.toRadians(initialAngle)) * fudge1,
+                    initialPoint.getY() - Math.cos(Math.toRadians(initialAngle)) * fudge1);
+            controlPoint2 = new Point2D.Double(endPoint.getX() + Math.sin(Math.toRadians(endingAngle)) * fudge2,
+                    endPoint.getY() + Math.cos(Math.toRadians(endingAngle)) * fudge2);
+        }
+
         update();
 
     }
 
-    public BezierCurveMovement(Point2D initialPoint, Point2D endPoint, Point2D controlPoint1, Point2D controlPoint2, int detail) {
+    public BezierCurveMovement(Point2D initialPoint, Point2D endPoint, Point2D controlPoint1, Point2D controlPoint2, boolean reverse, double detail) {
         this.initialPoint = initialPoint;
         this.endPoint = endPoint;
+        this.fudge1=Math.hypot(controlPoint1.getX()-initialPoint.getX(),controlPoint1.getY()-initialPoint.getY());
+        this.fudge2=Math.hypot(endPoint.getX()-controlPoint2.getX(),endPoint.getY()-controlPoint2.getY());
         this.controlPoint1 = controlPoint1;
         this.controlPoint2 = controlPoint2;
         this.detail = detail;
+        this.reverse=reverse;
         update();
     }
 
@@ -67,6 +82,9 @@ public class BezierCurveMovement implements Movement {
     @Override
     public void setStartPoint(Point2D startPoint) {
         this.initialPoint=startPoint;
+        autoDetail();
+        controlPoint1 = new Point2D.Double(initialPoint.getX() + Math.sin(Math.toRadians(initialAngle)) * fudge1,
+                initialPoint.getY() + Math.cos(Math.toRadians(initialAngle)) * fudge1);
         update();
     }
 
@@ -97,6 +115,12 @@ public class BezierCurveMovement implements Movement {
             currentAngle = Math.toRadians(90) - currentAngle;
             currentAngle = Math.toDegrees(currentAngle);
             currentAngle = dx<0? currentAngle + 180 : currentAngle;
+            //if reverse add 180 to current angle
+            if(reverse){
+                currentAngle+=180;
+                currentAngle%=360;
+            }
+
             snapshots.add(new Snapshot(currentX,currentY,currentAngle));
 
         }
@@ -104,6 +128,10 @@ public class BezierCurveMovement implements Movement {
         endingAngle = Math.toRadians(90) - endingAngle;
         endingAngle = Math.toDegrees(endingAngle);
         endingAngle = (endPoint.getX() - controlPoint2.getX()) <0 ? endingAngle + 180 : endingAngle;
+        if(reverse){
+            endingAngle+=180;
+            endingAngle%=360;
+        }
     }
 
     @Override
@@ -126,5 +154,77 @@ public class BezierCurveMovement implements Movement {
 
     public double getFudge2() {
         return fudge2;
+    }
+
+    public void setInitialPoint(Point2D initialPoint) {
+        setStartPoint(initialPoint);
+    }
+
+    public void setEndPoint(Point2D endPoint) {
+        this.endPoint = endPoint;
+        autoDetail();
+        updateControlPoint2();
+        update();
+    }
+
+    public void setInitialAngle(double initialAngle) {
+        this.initialAngle = initialAngle;
+        updateControlPoint1();
+        update();
+    }
+
+    public void setEndingAngle(double endingAngle) {
+        this.endingAngle = endingAngle;
+        updateControlPoint2();
+        update();
+    }
+
+    public void setFudge1(double fudge1) {
+        this.fudge1 = fudge1;
+        updateControlPoint1();
+        update();
+    }
+
+    public void setFudge2(double fudge2) {
+        this.fudge2 = fudge2;
+        updateControlPoint2();
+        update();
+    }
+
+    private void updateControlPoint1(){
+        if(!reverse){
+            controlPoint1 = new Point2D.Double(initialPoint.getX() + Math.sin(Math.toRadians(initialAngle)) * fudge1,
+                    initialPoint.getY() + Math.cos(Math.toRadians(initialAngle)) * fudge1);
+        }else{
+            controlPoint1 = new Point2D.Double(initialPoint.getX() - Math.sin(Math.toRadians(initialAngle)) * fudge1,
+                    initialPoint.getY() - Math.cos(Math.toRadians(initialAngle)) * fudge1);
+        }
+    }
+
+    private void updateControlPoint2(){
+        if(!reverse){
+            controlPoint2 = new Point2D.Double(endPoint.getX() - Math.sin(Math.toRadians(endingAngle)) * fudge2,
+                    endPoint.getY() - Math.cos(Math.toRadians(endingAngle)) * fudge2);
+        }else{
+            controlPoint2 = new Point2D.Double(endPoint.getX() + Math.sin(Math.toRadians(endingAngle)) * fudge2,
+                    endPoint.getY() + Math.cos(Math.toRadians(endingAngle)) * fudge2);
+        }
+
+    }
+
+    @Override
+    public boolean getReverse() {
+        return reverse;
+    }
+
+    @Override
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
+        updateControlPoint2();
+        updateControlPoint1();
+    }
+
+    private void autoDetail(){
+        setDetail(Math.hypot(endPoint.getX()-getStartPoint().getX(), endPoint.getY()-getStartPoint().getY())/120);
     }
 }

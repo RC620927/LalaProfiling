@@ -16,6 +16,8 @@ public interface Movement {
 
     void setDetail(double detail);
 
+    void setInitialAngle(double initialAngle);
+
     Point2D getEndPoint();
 
     Point2D getStartPoint();
@@ -28,5 +30,10 @@ public interface Movement {
 
     double getEndAngle();
 
+    void setReverse(boolean reverse);
+
+    boolean getReverse();
+
     ArrayList<Snapshot> getSnapshots();
+
 }

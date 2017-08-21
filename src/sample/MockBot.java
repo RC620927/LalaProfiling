@@ -148,6 +148,14 @@ public class MockBot {
         return mt;
     }
 
+    public void resetPosition(){
+        botNode.setRotate(getMovement().getInitialAngle());
+        botNode.setTranslateX(scrollX + (zoom * getMovement().getStartPoint().getX() - botNode.getBoundsInLocal().getWidth()/2));
+        botNode.setTranslateY(500- scrollY - (zoom * getMovement().getStartPoint().getY() + botNode.getBoundsInLocal().getHeight()/2));
+        guideNode.setTranslateX( zoom * getMovement().getStartPoint().getX() );
+        guideNode.setTranslateY(500- (zoom*getMovement().getStartPoint().getY() ) );
+    }
+
     public void setScrollX(double scrollX) {
         this.scrollX = scrollX;
     }
@@ -160,5 +168,27 @@ public class MockBot {
         this.getBotNode().setScaleY(zoom);
         this.getBotNode().setScaleX(zoom);
         this.zoom = zoom;
+    }
+
+    public void update(){
+        this.snapshots = movement.getSnapshots();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MockBot mockBot = (MockBot) o;
+
+        if (position != mockBot.position) return false;
+        return snapshots.equals(mockBot.snapshots);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = snapshots.hashCode();
+        result = 31 * result + position;
+        return result;
     }
 }

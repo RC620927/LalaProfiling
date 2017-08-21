@@ -66,6 +66,9 @@ public class MockBotView extends Group{
             System.out.println("Z:" +zoom);
         });
 
+        this.setOnMouseClicked(e->{
+            resetNodes();
+        });
         g = this;
         mockBotListView = new MockBotListView(this.mockBotBuild, this);
         mockBotDotsViewer = new MockBotDotsViewer(this.mockBotBuild, this);
@@ -104,10 +107,11 @@ public class MockBotView extends Group{
         }
     }
 
+    private boolean playing = false;
     public void play(){
         new Thread(){
             public void run(){
-
+                playing=true;
                 for(MockBot mb: mockBotBuild.getMockBots()){ mb.setVisibility(false);}
 
                     int i =0;
@@ -128,10 +132,27 @@ public class MockBotView extends Group{
                         mb.setVisibility(false);
                     }
                 }
+                playing=false;
             }
         }.start();
 
 
+    }
+
+    public void resetNodes(){
+        System.out.println("111");
+        if(playing==false){
+
+            System.out.println("222");
+            this.getChildren().forEach(e->{
+                e.setVisible(false);
+            });
+            MockBot first =  mockBotBuild.getMockBots().get(0);
+            if(first!=null){
+                first.resetPosition();
+                first.getBotNode().setVisible(true);
+            }
+        }
     }
 
     public class MockBotListView extends ListView<MockBot>{
@@ -186,6 +207,7 @@ public class MockBotView extends Group{
         }
 
         public void update(){
+            MockBot selected = this.getSelectionModel().getSelectedItem();
             if(this.getItems().size()!=0){
                 this.getItems().remove(0,this.getItems().size());
             }
@@ -197,10 +219,16 @@ public class MockBotView extends Group{
                 this.getItems().add(mb);
             }
             System.out.println(this.getItems().size());
+            try{
+                this.getSelectionModel().select(selected);
+            }catch(Exception e){
+
+            }
         }
 
         public void onMouseClicked(){
             mockBotView.getMockBotDotsViewer().highlight(this.getSelectionModel().getSelectedItem());
+            mockBotView.resetNodes();
             System.out.println("PRESSED");
         }
 
@@ -243,7 +271,7 @@ public class MockBotView extends Group{
         private MockBot pastMockBot=null;
         public void highlight(MockBot mb){
             ArrayList<Rectangle> rectangles = points.get(mb);
-            if(pastMockBot!=null){
+            if(pastMockBot!=null && points.get(pastMockBot)!=null){
                 for(Rectangle r: points.get(pastMockBot)){
                     r.setFill(Color.BLACK);
                     r.setHeight(2);
@@ -262,9 +290,9 @@ public class MockBotView extends Group{
                     r.setY(r.getY()-3);
                 }
                 pastMockBot = mb;
+
             }
         }
-
         public void setScrollX(double scrollX) {
             this.scrollX = scrollX;
             update();
