@@ -43,21 +43,25 @@
       </MenuBar>
       <GridPane minHeight="800.0" minWidth="1200.0" prefHeight="900.0" prefWidth="1300.0" VBox.vgrow="ALWAYS">
          <children>
-            <StackPane prefHeight="150.0" prefWidth="200.0">
+            <VBox fx:id="BIGLAYOUT" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                <children>
-                  <AnchorPane fx:id="layoutAnchorPane" prefHeight="750.0" prefWidth="1130.0">
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
                      <children>
-                        <Group fx:id="viewGroup" layoutX="222.0" layoutY="346.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <AnchorPane fx:id="layoutAnchorPane" prefHeight="750.0" prefWidth="1130.0">
+                           <children>
+                              <Group fx:id="viewGroup" layoutX="222.0" layoutY="346.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <ScrollBar fx:id="scrollBarY" blockIncrement="1.0" layoutX="7.0" layoutY="21.0" max="1000.0" orientation="VERTICAL" visibleAmount="100.0" />
+                              <ScrollBar fx:id="scrollBarX" layoutX="7.0" layoutY="7.0" max="1000.0" />
+                           </children>
+                        </AnchorPane>
                      </children>
-                  </AnchorPane>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <ScrollBar fx:id="scrollBarY" blockIncrement="1.0" layoutX="26.0" layoutY="48.0" max="1000.0" orientation="VERTICAL" visibleAmount="100.0" />
-                        <ScrollBar fx:id="scrollBarX" layoutX="26.0" layoutY="30.0" max="1000.0" />
-                     </children>
-                  </AnchorPane>
+                  </StackPane>
                </children>
-            </StackPane>
+            </VBox>
             <HBox maxWidth="170.0" prefHeight="660.0" prefWidth="174.0" GridPane.columnIndex="1" GridPane.hgrow="NEVER">
                <children>
                   <Separator orientation="VERTICAL" prefHeight="200.0" />

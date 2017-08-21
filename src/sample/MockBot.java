@@ -170,7 +170,7 @@ public class MockBot {
         this.zoom = zoom;
     }
 
-    public void update(){
+    synchronized public void update(){
         this.snapshots = movement.getSnapshots();
     }
 

@@ -3,6 +3,7 @@ package sample;
 import javafx.animation.PathTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.DepthTest;
 import javafx.scene.Group;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -31,10 +32,11 @@ public class MockBotView extends Group{
 
     private MockBotListView mockBotListView;
     private MockBotDotsViewer mockBotDotsViewer;
-   // private Rectangle outline;
+    private Rectangle outline;
 
     private double zoom;
     private double scrollX, scrollY;
+
 
 
     //750 pixels height for 54" when at 25% zoom
@@ -42,14 +44,16 @@ public class MockBotView extends Group{
     public MockBotView(MockBotBuild mockBotBuild){
 
         super();
+
         zoom =1;
         this.mockBotBuild = mockBotBuild;
         mockBotBuild.setMockBotView(this);
         int i =0;
-        //outline = new Rectangle(0,0,324,648);
-        //outline.setFill(Color.TRANSPARENT);
-        //outline.setStroke(Color.BLACK);
-       // this.getChildren().add(outline);
+    //    outline = new Rectangle(0,0,324,648);
+     //   outline.setStroke(Color.BLACK);
+      //  outline.setFill(Color.TRANSPARENT);
+
+
         for(MockBot mb : mockBotBuild.getMockBots()){
             if(i++ ==0){
                 mb.setVisibility(true);
@@ -72,7 +76,6 @@ public class MockBotView extends Group{
         g = this;
         mockBotListView = new MockBotListView(this.mockBotBuild, this);
         mockBotDotsViewer = new MockBotDotsViewer(this.mockBotBuild, this);
-
     }
 
     public MockBotBuild getMockBotBuild(){
@@ -82,28 +85,37 @@ public class MockBotView extends Group{
     public void setZoom(double zoom) {
         this.zoom = zoom;
         this.getMockBotDotsViewer().setZoom(zoom);
-        //outline.setWidth(324 * zoom * 4);
-        //outline.setHeight(648 * 4 * zoom);
+     //   outline.setWidth(324 * zoom * 4);
+     //   outline.setHeight(648 * 4 * zoom);
         for(MockBot mb: mockBotBuild.getMockBots()){
             mb.setZoom(this.zoom);
+        }
+        if(!playing){
+            resetNodes();
         }
     }
 
     public void setScrollX(double scrollX) {
         this.scrollX = scrollX;
-        //outline.setX(scrollX);
+    //    outline.setX(scrollX);
         this.getMockBotDotsViewer().setScrollX(scrollX);
         for(MockBot mb: mockBotBuild.getMockBots()){
             mb.setScrollX(this.scrollX);
+        }
+        if(!playing){
+            resetNodes();
         }
     }
 
     public void setScrollY(double scrollY) {
         this.scrollY = scrollY;
-        //outline.setY(-scrollY);
+    //    outline.setY(-scrollY);
         this.getMockBotDotsViewer().setScrollY(scrollY);
         for(MockBot mb: mockBotBuild.getMockBots()){
             mb.setScrollY(this.scrollY);
+        }
+        if(!playing){
+            resetNodes();
         }
     }
 
@@ -254,7 +266,7 @@ public class MockBotView extends Group{
             update();
         }
 
-        public void update(){
+        synchronized public void update(){
             points=new HashMap<>();
             this.getChildren().removeAll(this.getChildren());
             for(MockBot mb: mockBotBuild.getMockBots()){

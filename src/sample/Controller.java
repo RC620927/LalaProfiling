@@ -12,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -92,6 +93,9 @@ public class Controller {
 
     public NumberSpinner initialX,initialY, endingX,endingY, distance, initialAngle, endingAngle, initialSpeed,endingSpeed,topSpeed,fudge1,fudge2;
 
+    @FXML
+    public VBox BIGLAYOUT;
+
 
 
     MockBotView mockBotView;
@@ -101,8 +105,20 @@ public class Controller {
 
     boolean key = false;
     boolean togglerKey =false;
+
+    double refreshRate = 30; //refreshes per second
+    double scrollXRefreshed; // time in millis when last scrolled.. to prevent wasting alot of resources.
+    double scrollYRefreshed; // time in millis when last scrolled.. to prevent wasting alot of resources.
+
     @FXML
     public void initialize(){
+
+        Rectangle clipRectangle = new Rectangle();
+        BIGLAYOUT.setClip(clipRectangle);
+        BIGLAYOUT.layoutBoundsProperty().addListener((observable, oldValue, newValue) -> {
+            clipRectangle.setWidth(newValue.getWidth());
+            clipRectangle.setHeight(newValue.getHeight());
+        });
 
 
 
@@ -141,6 +157,28 @@ public class Controller {
         fudgeHBox.getChildren().addAll(fudge1,fudge2);
 
 
+        //setup scrollbars
+        scrollXRefreshed = System.currentTimeMillis();
+        scrollYRefreshed = System.currentTimeMillis();
+        scrollBarX.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if(System.currentTimeMillis()-scrollXRefreshed >1000/refreshRate){
+                    mockBotView.setScrollX(newValue.doubleValue());
+                    scrollXRefreshed=System.currentTimeMillis();
+                }
+
+            }
+        });
+        scrollBarY.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if(System.currentTimeMillis()-scrollYRefreshed >1000/refreshRate){
+                    mockBotView.setScrollY(newValue.doubleValue());
+                    scrollYRefreshed=System.currentTimeMillis();
+                }
+            }
+        });
 
         //blackout boxes not necessary
         fudge1.setDisable(true);
@@ -313,43 +351,43 @@ public class Controller {
     }
 
     public void setValues(MockBot mb){
-        togglerKey = true;
-        this.initialX.setNumber(mb.getMovement().getStartPoint().getX());
-        this.initialY.setNumber(mb.getMovement().getStartPoint().getY());
-        this.endingX.setNumber(mb.getMovement().getEndPoint().getX());
-        this.endingY.setNumber(mb.getMovement().getEndPoint().getY());
-        double delX = endingX.getNumber() -initialX.getNumber();
-        double delY = endingY.getNumber()-initialY.getNumber();
-        this.distance.setNumber(Math.sqrt(delX * delX + Math.pow(delY, 2)));
-        this.initialAngle.setNumber(mb.getMovement().getInitialAngle());
-        this.endingAngle.setNumber(mb.getMovement().getEndAngle());
-        if(mb.getMovement().getReverse()){
-            this.reverseRadioButton.selectedProperty().set(true);
-        }else{
-            this.forwardsRadioButton.selectedProperty().set(true);
-        }
-        if(mb.getMt()== MockBot.MovementType.BEZIERCURVE){
-            this.fudge1.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge1());
-            this.fudge2.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge2());
-            toggleBCBoxes();
-
-            System.out.println("BC");
-        }else{
-            if(mb.getMt() == MockBot.MovementType.LINE){
-
-                toggleLineBoxes();
-                System.out.println("Line");
+        if(mb!=null){
+            togglerKey = true;
+            this.initialX.setNumber(mb.getMovement().getStartPoint().getX());
+            this.initialY.setNumber(mb.getMovement().getStartPoint().getY());
+            this.endingX.setNumber(mb.getMovement().getEndPoint().getX());
+            this.endingY.setNumber(mb.getMovement().getEndPoint().getY());
+            double delX = endingX.getNumber() -initialX.getNumber();
+            double delY = endingY.getNumber()-initialY.getNumber();
+            this.distance.setNumber(Math.sqrt(delX * delX + Math.pow(delY, 2)));
+            this.initialAngle.setNumber(mb.getMovement().getInitialAngle());
+            this.endingAngle.setNumber(mb.getMovement().getEndAngle());
+            if(mb.getMovement().getReverse()){
+                this.reverseRadioButton.selectedProperty().set(true);
             }else{
-
-                toggleTurnBoxes();
-                System.out.println("Turn");
+                this.forwardsRadioButton.selectedProperty().set(true);
             }
-            fudge1.setNumber(0.0);
-            fudge2.setNumber(0.0);
-            togglerKey=false;
+            if(mb.getMt()== MockBot.MovementType.BEZIERCURVE){
+                this.fudge1.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge1());
+                this.fudge2.setNumber(((BezierCurveMovement) mb.getMovement()).getFudge2());
+                toggleBCBoxes();
+
+                System.out.println("BC");
+            }else{
+                if(mb.getMt() == MockBot.MovementType.LINE){
+
+                    toggleLineBoxes();
+                    System.out.println("Line");
+                }else{
+
+                    toggleTurnBoxes();
+                    System.out.println("Turn");
+                }
+                fudge1.setNumber(0.0);
+                fudge2.setNumber(0.0);
+                togglerKey=false;
+            }
         }
-
-
     }
 
     private void toggleLineBoxes(){

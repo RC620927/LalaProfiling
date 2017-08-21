@@ -169,7 +169,7 @@ public class MockBotBuild {
         return startingAngle;
     }
 
-    public void update(){
+    synchronized public void update(){
         int index =1;
         for(MockBot mb : mockBots){
             mb.setPosition(index);
