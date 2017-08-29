@@ -1,5 +1,8 @@
 package sample;
 
+import RealBot.RealBot;
+import RealBot.Trajectory;
+import RealBot.Path;
 import de.thomasbolz.javafx.NumberSpinner;
 import javafx.animation.PathTransition;
 import javafx.animation.RotateTransition;
@@ -15,7 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import sun.plugin.javascript.navig.Anchor;
@@ -106,12 +108,21 @@ public class Controller {
     boolean key = false;
     boolean togglerKey =false;
 
-    double refreshRate = 30; //refreshes per second
+    double refreshRate = 200; //refreshes per second
     double scrollXRefreshed; // time in millis when last scrolled.. to prevent wasting alot of resources.
     double scrollYRefreshed; // time in millis when last scrolled.. to prevent wasting alot of resources.
 
     @FXML
     public void initialize(){
+
+        LineMovement lm = new LineMovement(new Point2D.Double(0,0), new Point2D.Double(0,400),false,5);
+        BezierCurveMovement bcm = new BezierCurveMovement(new Point2D.Double(0, 0), new Point2D.Double(500,150), 0,130,300,150,false,5);
+        RotateMovement rm = new RotateMovement(new Point2D.Double(0, 0),0,90,5);
+        Path p = new Path(bcm.getSnapshots(), 50,new Snapshot(0,0,0));
+        Trajectory t = new Trajectory(p,0,0,150,0,100,160);
+        RealBot rb = new RealBot(t, 50);
+        BIGLAYOUT.getChildren().add(rb);
+
 
         Rectangle clipRectangle = new Rectangle();
         BIGLAYOUT.setClip(clipRectangle);
@@ -119,8 +130,6 @@ public class Controller {
             clipRectangle.setWidth(newValue.getWidth());
             clipRectangle.setHeight(newValue.getHeight());
         });
-
-
 
         ToggleGroup directionTG = new ToggleGroup();
         directionTG.getToggles().add(reverseRadioButton);
@@ -194,7 +203,8 @@ public class Controller {
 
         //setup Mock bots
         mockBotBuild= new MockBotBuild(new Point2D.Double(200,0), 0);
-        mockBotBuild.addLine(200,false);
+       mockBotBuild.addBezierCurve(new Point2D.Double(500,200),60,100,200,false);
+        // mockBotBuild.addLine(200,false);
 /*
         mockBotBuild.addBezierCurve(new Point2D.Double(400,120), 270, 150,100,true);
 
@@ -317,7 +327,8 @@ public class Controller {
         //setup table
 
         runButton.setOnAction(e->{
-            mockBotView.play();
+            //mockBotView.play();
+            rb.play();
         });
 
         deleteButton.setOnAction(e->{

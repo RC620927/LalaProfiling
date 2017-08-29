@@ -6,7 +6,7 @@ package sample;
 public class Snapshot {
 
 
-    double x,y, angle;
+    public double x,y, angle;
 
     public Snapshot(double x, double y, double angle) {
         this.x = x;

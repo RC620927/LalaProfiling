@@ -1,10 +1,14 @@
 package sample;
 
+import RealBot.Path;
+import RealBot.Trajectory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.awt.geom.Point2D;
 
 public class Main extends Application {
 
@@ -21,7 +25,6 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
-
 
     }
 }

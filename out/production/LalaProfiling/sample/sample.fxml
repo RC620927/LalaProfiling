@@ -54,8 +54,8 @@
                         </AnchorPane>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                            <children>
-                              <ScrollBar fx:id="scrollBarY" blockIncrement="1.0" layoutX="7.0" layoutY="21.0" max="1000.0" orientation="VERTICAL" visibleAmount="100.0" />
-                              <ScrollBar fx:id="scrollBarX" layoutX="7.0" layoutY="7.0" max="1000.0" />
+                              <ScrollBar fx:id="scrollBarY" blockIncrement="1.0" layoutX="5.0" layoutY="25.0" max="1000.0" min="-1000.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="21.0" visibleAmount="100.0" />
+                              <ScrollBar fx:id="scrollBarX" layoutX="7.0" layoutY="7.0" max="1000.0" min="-1000.0" prefHeight="21.0" prefWidth="198.0" />
                            </children>
                         </AnchorPane>
                      </children>
