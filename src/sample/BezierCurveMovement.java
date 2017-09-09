@@ -12,6 +12,7 @@ public class BezierCurveMovement implements Movement {
 
 
     private Point2D initialPoint, endPoint, controlPoint1,controlPoint2;
+    //detail is the extent to how many snapshots are wanted to create. Currently used as approximate "seconds" the process would take.
     private double detail;
     private ArrayList<Snapshot> robotSnapshots;
     private boolean reverse;
@@ -89,7 +90,8 @@ public class BezierCurveMovement implements Movement {
     }
 
     //based on [x,y]=(1–t)3P0+3(1–t)2tP1+3(1–t)t2P2+t3P3
-
+    //creates all the snapshots for the given constants
+    //used everytime a variable is changed or the first time initiated
     @Override
     public void update() {
         snapshots = new ArrayList<>();
@@ -191,6 +193,7 @@ public class BezierCurveMovement implements Movement {
         update();
     }
 
+    //updates controlpoints based on a fudge, initial or ending point,and initial angle of ending angle.
     private void updateControlPoint1(){
         if(!reverse){
             controlPoint1 = new Point2D.Double(initialPoint.getX() + Math.sin(Math.toRadians(initialAngle)) * fudge1,
@@ -224,6 +227,7 @@ public class BezierCurveMovement implements Movement {
         updateControlPoint1();
     }
 
+    //automatically assigns a level of detail to be used
     private void autoDetail(){
         setDetail(Math.hypot(endPoint.getX()-getStartPoint().getX(), endPoint.getY()-getStartPoint().getY())/120);
     }

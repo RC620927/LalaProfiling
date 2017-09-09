@@ -60,7 +60,8 @@ public class LineMovement implements Movement {
         update();
     }
 
-
+    //creates all the snapshots for the given constants
+    //used everytime a variable is changed or the first time initiated
     @Override
     public void update() {
 

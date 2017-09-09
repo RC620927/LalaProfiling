@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.*?>
 <?import javafx.scene.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
@@ -45,7 +46,7 @@
          <children>
             <VBox fx:id="BIGLAYOUT" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                <children>
-                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                  <StackPane fx:id="stackPaneViewer" prefHeight="150.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                      <children>
                         <AnchorPane fx:id="layoutAnchorPane" prefHeight="750.0" prefWidth="1130.0">
                            <children>
@@ -54,8 +55,9 @@
                         </AnchorPane>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                            <children>
-                              <ScrollBar fx:id="scrollBarY" blockIncrement="1.0" layoutX="7.0" layoutY="21.0" max="1000.0" orientation="VERTICAL" visibleAmount="100.0" />
-                              <ScrollBar fx:id="scrollBarX" layoutX="7.0" layoutY="7.0" max="1000.0" />
+                              <ScrollBar fx:id="scrollBarY" blockIncrement="1.0" layoutX="5.0" layoutY="25.0" max="1000.0" min="-1000.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="21.0" visibleAmount="100.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="36.0" />
+                              <ScrollBar fx:id="scrollBarX" layoutY="4.0" max="1000.0" min="-1000.0" prefHeight="21.0" prefWidth="198.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0" />
+                              <Slider fx:id="zoomSlider" layoutX="941.0" layoutY="27.0" max="2.0" min="0.25" value="1.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="15.0" />
                            </children>
                         </AnchorPane>
                      </children>
@@ -104,12 +106,12 @@
                   <Separator prefWidth="200.0" />
                   <GridPane hgap="10.0" vgap="10.0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS">
                      <children>
-                        <Label text="A: ">
+                        <Label text="Randomness:">
                            <font>
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label text="B:" GridPane.rowIndex="1">
+                        <Label text="Realistic" GridPane.rowIndex="1">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -119,12 +121,12 @@
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label text="Label" GridPane.columnIndex="2">
+                        <Label text="Top Speed:" GridPane.columnIndex="2">
                            <font>
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <Label text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                        <Label text="Max Acceleration" GridPane.columnIndex="2" GridPane.rowIndex="1">
                            <font>
                               <Font size="20.0" />
                            </font>
@@ -134,6 +136,13 @@
                               <Font size="20.0" />
                            </font>
                         </Label>
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <RadioButton mnemonicParsing="false" text="Yes" />
+                              <RadioButton mnemonicParsing="false" text="No" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
                      </children>
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

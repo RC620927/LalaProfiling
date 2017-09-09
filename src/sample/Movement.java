@@ -10,7 +10,7 @@ public interface Movement {
 
 
 
-    public static int refreshRate = 50;
+    public static int refreshRate = 10000;
 
     double getDetail();
 

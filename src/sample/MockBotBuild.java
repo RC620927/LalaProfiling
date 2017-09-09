@@ -141,7 +141,7 @@ public class MockBotBuild {
         double endY = endPoint.getY();
         double distance = Math.hypot(endX-startX, endY-startY);
 
-        BezierCurveMovement bcm = new BezierCurveMovement(mockBots.get(mockBots.size()-1).getMovement().getEndPoint(),
+        BezierCurveMovement bcm = new BezierCurveMovement(new Point2D.Double(startX,startY),
                 endPoint, pastAngle, endingAngle, fudge1, fudge2, reverse, distance/120 );
         MockBot mb = new MockBot(new Image("RobotPicture.png"), bcm, MockBot.MovementType.BEZIERCURVE);
         mockBots.add(mb);
