@@ -84,8 +84,7 @@ public class BezierCurveMovement implements Movement {
     public void setStartPoint(Point2D startPoint) {
         this.initialPoint=startPoint;
         autoDetail();
-        controlPoint1 = new Point2D.Double(initialPoint.getX() + Math.sin(Math.toRadians(initialAngle)) * fudge1,
-                initialPoint.getY() + Math.cos(Math.toRadians(initialAngle)) * fudge1);
+        updateControlPoint1();
         update();
     }
 
@@ -93,7 +92,7 @@ public class BezierCurveMovement implements Movement {
     //creates all the snapshots for the given constants
     //used everytime a variable is changed or the first time initiated
     @Override
-    public void update() {
+    public  synchronized void update() {
         snapshots = new ArrayList<>();
         for(double i =0; i< refreshRate*detail ;i++){
             double t = (1+i)/(refreshRate * detail);
@@ -230,5 +229,10 @@ public class BezierCurveMovement implements Movement {
     //automatically assigns a level of detail to be used
     private void autoDetail(){
         setDetail(Math.hypot(endPoint.getX()-getStartPoint().getX(), endPoint.getY()-getStartPoint().getY())/120);
+    }
+    public BezierCurveMovement clone() {
+        return new BezierCurveMovement(new Point2D.Double(this.initialPoint.getX(), this.initialPoint.getY()),
+                new Point2D.Double(endPoint.getX(), endPoint.getY()), initialAngle, endingAngle, fudge1, fudge2,
+                reverse, detail);
     }
 }

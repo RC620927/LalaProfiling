@@ -28,7 +28,17 @@ public class RList<type> implements  RObservable<RList<type>>{
     }
 
     public synchronized type getItem(int i){
-        return itemsArrayList.get(i);
+        type item;
+        try{
+            item = itemsArrayList.get(i);
+        }catch(IndexOutOfBoundsException e){
+            item=null;
+        }
+        return item;
+    }
+
+    public int size(){
+        return itemsArrayList.size();
     }
 
     public synchronized void add(type item){
@@ -65,9 +75,20 @@ public class RList<type> implements  RObservable<RList<type>>{
         }
     }
 
+    public ArrayList<type> getArrayList() {
+        return itemsArrayList;
+    }
+
     public void addChangeListener(BiConsumer<RList<type>, RList<type>> changeListener){
         if(changeListener!=null){
             this.changeListeners.add(changeListener);
+        }
+    }
+
+    @Override
+    public void removeChangeListener(BiConsumer<RList<type>, RList<type>> changeListener) {
+        if(changeListener!=null){
+            this.changeListeners.remove(changeListener);
         }
     }
 }

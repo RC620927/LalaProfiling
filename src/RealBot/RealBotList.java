@@ -17,7 +17,7 @@ public class RealBotList extends RList<RObservableMovement>{
         this.realBotBuilder=realBotBuilder;
     }
 
-    public void addLine(double distance, boolean reverse,
+    public void addLine(String name, double distance, boolean reverse,
                         double topSpeed, double endingSpeed){
         double pastAngle, startX, startY, initialSpeed;
         if(this.getItems().isEmpty()){
@@ -32,19 +32,20 @@ public class RealBotList extends RList<RObservableMovement>{
             pastAngle = this.getItems().get(this.getItems().size()-1).getEndAngle();
             initialSpeed = this.getItems().get(this.getItems().size()-1).getEndingSpeed();
         }
+        double effectiveMovingAngle = reverse? pastAngle+180:pastAngle;
 
         double endX = startX +
-                Math.sin(Math.toRadians(pastAngle)) * distance;
+                Math.sin(Math.toRadians(effectiveMovingAngle)) * distance;
         double endY = startY +
-                Math.cos(Math.toRadians(pastAngle)) * distance;
+                Math.cos(Math.toRadians(effectiveMovingAngle)) * distance;
 
         LineMovement lm = new LineMovement(new Point2D.Double(startX,startY),
                 new Point2D.Double(endX,endY),reverse, distance/160);
-        addMovement(lm,RObservableMovement.MovementType.LINE, initialSpeed, topSpeed, endingSpeed);
+        addMovement(name, lm,RObservableMovement.MovementType.LINE, initialSpeed, topSpeed, endingSpeed);
     }
 
     //add a line, but if endpoint with angle does not quite align, then rotate first. should depracate at some point
-    public void addLine(Point2D endPoint, boolean reverse, double topSpeed, double endingSpeed){
+    public void addLine(String name, Point2D endPoint, boolean reverse, double topSpeed, double endingSpeed){
         double pastAngle, startX, startY, initialSpeed;
         if(this.getItems().isEmpty()){
             pastAngle = realBotBuilder.getStartingAngle();
@@ -71,15 +72,15 @@ public class RealBotList extends RList<RObservableMovement>{
         if(Math.abs(RotateMovement.getChangeTheta(travelAngle,pastAngle)) >1 ){
             RotateMovement rm = new RotateMovement(new Point2D.Double(startX,startY),
                     pastAngle,travelAngle, RotateMovement.getChangeTheta(travelAngle,pastAngle)/200);
-            addMovement(rm,RObservableMovement.MovementType.ROTATE, initialSpeed, topSpeed, endingSpeed);
+            addMovement(name +"ROTATE",rm,RObservableMovement.MovementType.ROTATE, initialSpeed, topSpeed, endingSpeed);
         }
 
         //initialspeeds for movements messed up
         LineMovement lm = new LineMovement(new Point2D.Double(startX,startY), new Point2D.Double(endX,endY), reverse, distance/160);
-        addMovement(lm,RObservableMovement.MovementType.LINE, initialSpeed, topSpeed, endingSpeed);
+        addMovement(name, lm,RObservableMovement.MovementType.LINE, initialSpeed, topSpeed, endingSpeed);
     }
 
-    public void addTurn(double endingAngle,
+    public void addTurn(String name, double endingAngle,
                          double topSpeed, double endingSpeed){
         double pastAngle, startX, startY, initialSpeed;
         if(this.getItems().isEmpty()){
@@ -96,11 +97,11 @@ public class RealBotList extends RList<RObservableMovement>{
 
         RotateMovement rm = new RotateMovement(new Point2D.Double(startX,startY),
                 pastAngle,endingAngle,  Math.abs(RotateMovement.getChangeTheta(endingAngle,pastAngle))/200);
-        addMovement(rm, RObservableMovement.MovementType.ROTATE, initialSpeed, topSpeed, endingSpeed);
+        addMovement(name, rm, RObservableMovement.MovementType.ROTATE, initialSpeed, topSpeed, endingSpeed);
     }
 
 
-    public void addBezierCurve(Point2D endPoint, double endingAngle, double fudge1, double fudge2, boolean reverse,
+    public void addBezierCurve(String name, Point2D endPoint, double endingAngle, double fudge1, double fudge2, boolean reverse,
                                double topSpeed, double endingSpeed){
         double pastAngle, startX, startY, initialSpeed;
         if(this.getItems().isEmpty()){
@@ -123,12 +124,12 @@ public class RealBotList extends RList<RObservableMovement>{
         BezierCurveMovement bcm = new BezierCurveMovement(new Point2D.Double(startX,startY),
                 endPoint, pastAngle, endingAngle, fudge1, fudge2, reverse, distance/120 );
 
-        addMovement(bcm, RObservableMovement.MovementType.BEZIERCURVE,
+        addMovement(name, bcm, RObservableMovement.MovementType.BEZIERCURVE,
                 initialSpeed, topSpeed, endingSpeed);
 
     }
 
-    public void addQuarticBezierCurve(Point2D endPoint, double endingAngle, double fudge1, double fudge2,double cpx, double cpy, boolean reverse,
+    public void addQuarticBezierCurve(String name, Point2D endPoint, double endingAngle, double fudge1, double fudge2,double cpx, double cpy, boolean reverse,
                                double topSpeed, double endingSpeed){
         double pastAngle, startX, startY, initialSpeed;
         if(this.getItems().isEmpty()){
@@ -148,20 +149,50 @@ public class RealBotList extends RList<RObservableMovement>{
         double endY = endPoint.getY();
         double distance = Math.hypot(endX-startX, endY-startY);
 
-        QuarticBezierCurveMovement bcm = new QuarticBezierCurveMovement(new Point2D.Double(startX,startY),
+        QuarticBezierCurveMovement qbcm = new QuarticBezierCurveMovement(new Point2D.Double(startX,startY),
                 endPoint, pastAngle, endingAngle, fudge1, fudge2,cpx,cpy, reverse, distance/120 );
 
-        addMovement(bcm, RObservableMovement.MovementType.BEZIERCURVE,
+        addMovement(name, qbcm, RObservableMovement.MovementType.BEZIERCURVE,
                 initialSpeed, topSpeed, endingSpeed);
 
     }
 
+    //time in millis
+    public void addStill(String name, double millis){
+        double pastAngle, startX, startY, initialSpeed;
+        if(this.getItems().isEmpty()){
+            pastAngle = realBotBuilder.getStartingAngle();
+            startX = realBotBuilder.getStartingPoint().getX();
+            startY = realBotBuilder.getStartingPoint().getY();
+            initialSpeed = 0;
 
-    private void addMovement(Movement movement,
+        }else{
+            startX = this.getItems().get(this.getItems().size()-1).getEndPoint().getX();
+            startY = this.getItems().get(this.getItems().size()-1).getEndPoint().getY();
+            pastAngle = this.getItems().get(this.getItems().size()-1).getEndAngle();
+            initialSpeed = this.getItems().get(this.getItems().size()-1).getEndingSpeed();
+        }
+        if(Math.abs(initialSpeed)<=25){
+            StillMovement sm = new StillMovement(new Point2D.Double(startX,startY),
+                     pastAngle,millis/1000, 1);
+
+            addMovement(name, sm, RObservableMovement.MovementType.STILL,
+                    initialSpeed, 0, 0);
+        }
+    }
+
+
+
+
+    private void addMovement(String name, Movement movement,
                              RObservableMovement.MovementType movementType, double initialSpeed, double topSpeed, double endingSpeed){
-        RObservableMovement rom = new RObservableMovement(movement, movementType,
+        RObservableMovement rom = new RObservableMovement(name, movement, movementType,
                 initialSpeed, topSpeed, endingSpeed);
         realBotBuilder.addChangeListenerToMovement(rom);
         this.add(rom);
+    }
+
+    public void removeMovement(RObservableMovement m){
+
     }
 }

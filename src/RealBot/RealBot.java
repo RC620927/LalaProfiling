@@ -1,11 +1,7 @@
 package RealBot;
 
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
-import rc.CastrooOrnelas.datatypes.RPID;
-
-import java.util.Random;
+import rc.CastrooOrnelas.controls.RPID;
 
 /**
  * Created by raque on 8/26/2017.
@@ -86,7 +82,7 @@ public class RealBot extends Rectangle{
                        // rightVel*= (0.95 + new Random().nextDouble()/10);
                         anglePID.setSetPoint(m.angle);
                         double anglePIDOutput = anglePID.crunch(currentTheta);
-                        //anglePIDOutput=0;
+                       // anglePIDOutput=0;
                         leftVel+=anglePIDOutput;
                         rightVel-=anglePIDOutput;
 
@@ -113,7 +109,8 @@ public class RealBot extends Rectangle{
                         past1Wanted=m.angle;
                         past2Wanted=past1Wanted;
                         past3Wanted=past2Wanted;
-                        System.out.println(m.timeStamp +":   X:"+ currentX + "   Y:" + currentY  + "   TH:" + currentTheta);
+                        System.out.println(m.timeStamp +":   WX:"+m.x+ "    WY:" +m.y+"    WTH:" + m.angle+"    WLVEL:" + m.lVel+"    WRVEL:" + m.rVel);
+                        System.out.println(m.timeStamp +":   X:"+ currentX + "   Y:" + currentY  + "   TH:" + currentTheta + "   XOFF:" +(currentX-m.x));
                         System.out.println(m.timeStamp +":   DelD:"+ delD + "    leftV:" + leftVel + "    RightV:" + rightVel + "    PID:" + anglePIDOutput);
                     }
                     playing=false;

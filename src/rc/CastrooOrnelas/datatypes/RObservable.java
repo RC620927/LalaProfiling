@@ -9,5 +9,6 @@ public interface RObservable<type>{
 
 
     public void addChangeListener(BiConsumer<type,type> changeListener);
+    public void removeChangeListener(BiConsumer<type,type> changeListener);
 
 }

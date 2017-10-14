@@ -65,7 +65,7 @@ public class NumberSpinner extends HBox {
         this.setId(NUMBER_SPINNER);
         this.stepWitdhProperty.set(stepWidth);
         this.getStylesheets().clear();
-        this.getStylesheets().add("file:src\\de\\thomasbolz\\javafx\\number_spinner.css");
+        this.getStylesheets().add(getClass().getResource("number_spinner.css").toExternalForm());
 
 
         // TextField
@@ -165,7 +165,7 @@ public class NumberSpinner extends HBox {
         this.setId(NUMBER_SPINNER);
         this.stepWitdhProperty.set(stepWidth);
         this.getStylesheets().clear();
-        this.getStylesheets().add("file:src\\de\\thomasbolz\\javafx\\number_spinner.css");
+        this.getStylesheets().add(getClass().getResource("number_spinner.css").toExternalForm());
 
 
         // TextField

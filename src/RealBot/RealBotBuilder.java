@@ -1,49 +1,51 @@
 package RealBot;
 
-import javafx.scene.canvas.Canvas;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import rc.CastroOrnelas.FRC.TrajectoryIO;
+import rc.CastrooOrnelas.FRC.TrajectoryIO;
 import rc.CastrooOrnelas.datatypes.RList;
 import rc.CastrooOrnelas.datatypes.RObservable;
 import sample.*;
 
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
 
 import static RealBot.Trajectory.refreshRate;
 
 /**
  * Created by raque on 8/24/2017.
  */
-public class RealBotBuilder{
+public class RealBotBuilder implements RObservable<ArrayList<Trajectory>>{
 
+    private ArrayList<BiConsumer<ArrayList<Trajectory>,ArrayList<Trajectory>>> changeListeners;
 
     private RList<Moment> momentList;
 
     private Point2D startingPoint;
     private Double startingAngle;
-    private double botWidth, botHeight;
+    private double botWidth, botLength;
     private double acceleration, stopAcceleration;
+    private double topSpeed;
 
     private int idgen;
 
     private RealBotList realBotList;
     private RealBot realBot;
 
+    private double randomness=0, difficulty=0, totalTime=0;
+
+
     private ArrayList<Trajectory> trajectories;
 
-    public RealBotBuilder(Point2D startingPoint, Double startingAngle, double botWidth, double botHeight,
-                          double acceleration, double stopAcceleration){
+    public RealBotBuilder(Point2D startingPoint, Double startingAngle, double botWidth, double botLength,
+                          double acceleration, double stopAcceleration, double topSpeed){
+        changeListeners= new ArrayList<>();
         this.startingPoint=startingPoint;
         this.startingAngle=startingAngle;
-        this.botHeight=botHeight;
+        this.botLength=botLength;
         this.botWidth=botWidth;
         this.acceleration=acceleration;
         this.stopAcceleration= stopAcceleration;
+        this.topSpeed=topSpeed;
         realBotList = new RealBotList(this);
         realBotList.addChangeListener((o,n)->{
             updateTrajectories();
@@ -56,8 +58,15 @@ public class RealBotBuilder{
     //delete after use
     public void testWriteExcel(){
         try {
+            double totalM = 0;
+            for(Trajectory t:trajectories){
+                totalM+=t.getMoments().size();
+            }
+            System.out.println("Total time: " + totalM * (1 / refreshRate));
+
             TrajectoryIO tio = new TrajectoryIO("Graphs.xlsx");
             tio.writeTrajectories(0,trajectories);
+
 
             /*XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet spreadsheet = workbook.createSheet("1");
@@ -104,7 +113,12 @@ public class RealBotBuilder{
             if(current.getEndPoint()!=old.getEndPoint() || current.getEndAngle()!=old.getEndAngle()){
                 updateAfterMovement(rom);
             }
+            int dfi=2;
+            if(current!=old){
+                updateTrajectories();
+            }
         });
+
     }
 
     public synchronized void updateAfterMovement(RObservableMovement rom){
@@ -126,6 +140,7 @@ public class RealBotBuilder{
     }
 
     public synchronized void updateTrajectories(){
+        ArrayList<Trajectory> cached = trajectories;
         trajectories = new ArrayList<>();
         int i=0;
         for(RObservableMovement rom: getMovements().getItems()){
@@ -145,13 +160,18 @@ public class RealBotBuilder{
                 Trajectory t = new RotateTrajectory(p,rom.getTopSpeed(),acceleration, stopAcceleration);
                 trajectories.add(t);
             }else if(rom.getMovementType() == RObservableMovement.MovementType.LINE ||
-                    rom.getMovementType() == RObservableMovement.MovementType.BEZIERCURVE){
+                    rom.getMovementType() == RObservableMovement.MovementType.BEZIERCURVE ||
+                    rom.getMovementType() == RObservableMovement.MovementType.QUARTICBEZIERCURVE){
                 Trajectory t = new StandardTrajectory(p, rom.getInitialSpeed(),
                         rom.getTopSpeed(),rom.getEndingSpeed(),acceleration,stopAcceleration);
+                trajectories.add(t);
+            }else if(rom.getMovementType() == RObservableMovement.MovementType.STILL){
+               Trajectory t = new StillTrajectory(p,((StillMovement) rom.getMovement()).getTime());
                 trajectories.add(t);
             }
 
         }
+        notifyListeners(cached);
     }
 
     public synchronized void updateAll(){
@@ -172,8 +192,8 @@ public class RealBotBuilder{
         return botWidth;
     }
 
-    public double getBotHeight() {
-        return botHeight;
+    public double getBotLength() {
+        return botLength;
     }
 
     public ArrayList<Trajectory> getTrajectories() {
@@ -182,5 +202,53 @@ public class RealBotBuilder{
 
     public RealBot getRealBot() {
         return realBot;
+    }
+
+    @Override
+    public void addChangeListener(BiConsumer<ArrayList<Trajectory>, ArrayList<Trajectory>> changeListener){
+        if(changeListener!=null){
+            this.changeListeners.add(changeListener);
+        }
+    }
+
+    @Override
+    public void removeChangeListener(BiConsumer<ArrayList<Trajectory>,ArrayList<Trajectory>> changeListener) {
+        if(changeListener!=null){
+            this.changeListeners.remove(changeListener);
+        }
+    }
+
+    private void notifyListeners(ArrayList<Trajectory> pastTrajectories){
+        for(BiConsumer bc: changeListeners){
+            bc.accept(pastTrajectories,trajectories);
+        }
+    }
+
+    public double getTopSpeed() {
+        return topSpeed;
+    }
+
+    public void setTopSpeed(double topSpeed) {
+        this.topSpeed = topSpeed;
+    }
+
+    public double getRandomness() {
+        return randomness;
+    }
+
+    public void setRandomness(double randomness) {
+        this.randomness = randomness;
+    }
+
+    public double getDifficulty() {
+        return difficulty;
+    }
+
+    public double getAcceleration() {
+        return acceleration;
+    }
+
+    public double getTotalTime() {
+        return totalTime;
     }
 }

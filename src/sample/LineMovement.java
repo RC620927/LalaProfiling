@@ -126,4 +126,9 @@ public class LineMovement implements Movement {
     private void autoDetail(){
         setDetail(Math.hypot(endPoint.getX()-getStartPoint().getX(), endPoint.getY()-getStartPoint().getY())/160);
     }
+
+    public LineMovement clone(){
+        return new LineMovement(new Point2D.Double(this.startPoint.getX(),this.startPoint.getY()),
+                new Point2D.Double(this.endPoint.getX(),this.endPoint.getY()),reverse,detail);
+    }
 }

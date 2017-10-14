@@ -14,4 +14,9 @@ public class RObservableTrajectory implements RObservable<Trajectory>{
     public void addChangeListener(BiConsumer<Trajectory, Trajectory> changeListener) {
 
     }
+
+    @Override
+    public void removeChangeListener(BiConsumer<Trajectory,Trajectory> changeListener) {
+
+    }
 }

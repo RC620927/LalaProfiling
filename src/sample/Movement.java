@@ -1,12 +1,14 @@
 package sample;
 
+import rc.CastrooOrnelas.datatypes.RCloneable;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 /**
  * Created by Ruben on 8/9/2017.
  */
-public interface Movement {
+public interface Movement extends RCloneable {
 
 
 

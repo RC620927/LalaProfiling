@@ -129,4 +129,8 @@ public class RotateMovement implements Movement {
     private void autoDetail(){
         setDetail(Math.abs(RotateMovement.getChangeTheta(getEndAngle(),getInitialAngle()))/200);
     }
+
+    public RotateMovement clone(){
+        return new RotateMovement(new Point2D.Double(this.startPoint.getX(),this.startPoint.getY()),initialAngle,endAngle,detail);
+    }
 }

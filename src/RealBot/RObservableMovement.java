@@ -9,15 +9,17 @@ import java.util.function.BiConsumer;
 
 /**
  * Created by raque on 8/24/2017.
+ * Wrapper for a Movement
  */
-public class RObservableMovement  implements RObservable<Movement>{
+public class RObservableMovement  implements RObservable<Movement>, Cloneable{
     private Movement movement;
     private ArrayList<BiConsumer<Movement,Movement>> changeListeners;
     private double initialSpeed, topSpeed, endingSpeed;
+    private String name;
     private MovementType movementType;
 
     public enum MovementType{
-        ROTATE("ROTATE"),LINE("LINE"),BEZIERCURVE("BEZIERCURVE");
+        ROTATE("ROTATE"),LINE("LINE"),BEZIERCURVE("BEZIERCURVE"),QUARTICBEZIERCURVE("QUARTICBEZIERCURVE"), STILL("STILL");
         String name;
         MovementType(String name){
             this.name=name;
@@ -27,7 +29,8 @@ public class RObservableMovement  implements RObservable<Movement>{
         }
     }
 
-    public RObservableMovement(Movement movement, MovementType movementType, double initialSpeed, double topSpeed, double endingSpeed) {
+    public RObservableMovement(String name,Movement movement, MovementType movementType, double initialSpeed, double topSpeed, double endingSpeed) {
+        this.name = name;
         this.movement = movement;
         this.initialSpeed = initialSpeed;
         this.topSpeed = topSpeed;
@@ -48,16 +51,18 @@ public class RObservableMovement  implements RObservable<Movement>{
 
     public void setDetail(double detail){
         if(detail!=movement.getDetail()){
-            Movement cached = movement;
+            Movement cached = (Movement) movement.clone();
             movement.setDetail(detail);
+            movement.update();
             notifyListeners(cached);
         }
     }
 
     public void setInitialAngle(double initialAngle){
         if(initialAngle!=movement.getInitialAngle()){
-            Movement cached = movement;
+            Movement cached = (Movement) movement.clone();
             movement.setInitialAngle(initialAngle);
+            movement.update();
             notifyListeners(cached);
         }
     }
@@ -76,8 +81,9 @@ public class RObservableMovement  implements RObservable<Movement>{
 
     public void setStartPoint(Point2D startPoint){
         if(!startPoint.equals(movement.getStartPoint())){
-            Movement cached = movement;
+            Movement cached = (Movement) movement.clone();
             movement.setStartPoint(startPoint);
+            movement.update();
             notifyListeners(cached);
         }
     };
@@ -88,8 +94,9 @@ public class RObservableMovement  implements RObservable<Movement>{
 
     public void setReverse(boolean reverse){
         if(reverse!=movement.getReverse()){
-            Movement cached = movement;
+            Movement cached = (Movement) movement.clone();
             movement.setReverse(reverse);
+            movement.update();
             notifyListeners(cached);
         }
     }
@@ -114,6 +121,12 @@ public class RObservableMovement  implements RObservable<Movement>{
         }
     }
 
+    public void removeChangeListener(BiConsumer<Movement,Movement> changeListener){
+        if(changeListeners!=null){
+            changeListeners.remove(changeListener);
+        }
+    }
+
     public double getInitialSpeed() {
         return initialSpeed;
     }
@@ -128,12 +141,29 @@ public class RObservableMovement  implements RObservable<Movement>{
     }
 
     //to set value of fudge1, fudge 2
-    public void setValue(String valueName, double value){
-        Movement cached = movement;
+    public void setValue(String valueName, Object value){
+        Movement cached = (Movement) movement.clone();
+        //check if valueName is a Trajectory variable (speeds) or if it is reverse - these are shared by all movements
+        switch(valueName){
+            case "top_speed":
+                this.topSpeed=(double) value;
+                break;
+            case "initial_speed":
+                this.initialSpeed=(double) value;
+                break;
+            case "ending_speeed":
+                this.endingSpeed=(double) value;
+                break;
+            case "reverse":
+                this.setReverse((boolean) value);
+
+        }
+
+        //check if valueName is a movement variable
         if(this.getMovementType() == MovementType.ROTATE){
             switch (valueName){
                 case "end_angle":
-                    ((RotateMovement) movement).setEndAngle(value);
+                    ((RotateMovement) movement).setEndAngle((double) value);
                     break;
             }
         }else if(this.getMovementType() == MovementType.LINE){
@@ -143,34 +173,59 @@ public class RObservableMovement  implements RObservable<Movement>{
                     pastAngle = getInitialAngle();
                     startX = getStartPoint().getX();
                     startY = getStartPoint().getY();
-
+                    boolean reverse = cached.getReverse();
+                    double effectiveTravelAngle = reverse?pastAngle+180:pastAngle;
                     double endX = startX +
-                            Math.sin(Math.toRadians(pastAngle)) * value;
+                            Math.sin(Math.toRadians(effectiveTravelAngle)) * (double) value;
                     double endY = startY +
-                            Math.cos(Math.toRadians(pastAngle)) * value;
+                            Math.cos(Math.toRadians(effectiveTravelAngle)) * (double) value;
                     ((LineMovement) movement).setEndPoint(new Point2D.Double(endX,endY));
                     break;
             }
         }else if(this.getMovementType() == MovementType.BEZIERCURVE){
             switch (valueName){
-                case "fudge1":
-                    ((BezierCurveMovement) movement).setFudge1(value);
+                case "fudge_1":
+                    ((BezierCurveMovement) movement).setFudge1((double) value);
                     break;
-                case "fudge2":
-                    ((BezierCurveMovement) movement).setFudge2(value);
+                case "fudge_2":
+                    ((BezierCurveMovement) movement).setFudge2((double) value);
                     break;
                 case "end_angle":
-                    ((BezierCurveMovement) movement).setEndingAngle(value);
+                    ((BezierCurveMovement) movement).setEndingAngle((double) value);
                     break;
                 case "end_x":
-                    ((BezierCurveMovement) movement).setEndPoint(new Point2D.Double(value, getEndPoint().getY()));
+                    ((BezierCurveMovement) movement).setEndPoint(new Point2D.Double((double) value, getEndPoint().getY()));
                     break;
                 case "end_y":
-                    ((BezierCurveMovement) movement).setEndPoint(new Point2D.Double(getEndPoint().getX(), value));
+                    ((BezierCurveMovement) movement).setEndPoint(new Point2D.Double(getEndPoint().getX(), (double) value));
+                    break;
+            }
+        }else if(this.getMovementType() == MovementType.STILL){
+            switch (valueName){
+                case "time":
+                    ((StillMovement) movement).setTime((double) value);
                     break;
             }
         }
+        movement.update();
         notifyListeners(cached);
     }
 
+    public Movement getMovement(){
+        return movement;
+    }
+
+    //clone this ROM, for the purposes of it being observable, one needs an old copy and a new copy
+    public RObservableMovement clone(){
+        return new RObservableMovement(name.substring(0,name.length()),
+                (Movement)movement.clone(),this.movementType,this.initialSpeed,this.topSpeed,this.endingSpeed);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

@@ -220,4 +220,10 @@ public class QuarticBezierCurveMovement implements Movement{
     private void autoDetail(){
         setDetail(Math.hypot(endPoint.getX()-getStartPoint().getX(), endPoint.getY()-getStartPoint().getY())/120);
     }
+
+    public QuarticBezierCurveMovement clone(){
+        return new QuarticBezierCurveMovement(new Point2D.Double(this.initialPoint.getX(),this.initialPoint.getY()),
+                new Point2D.Double(endPoint.getX(),endPoint.getY()), initialAngle,endingAngle,fudge1,fudge2,controlPointMiddle.getX(),controlPointMiddle.getY(),
+                reverse,detail);
+    }
 }

@@ -1,14 +1,23 @@
 package sample;
 
+import RealBot.IO.RealBotIO;
 import RealBot.Path;
+import RealBot.RealBotBuilder;
 import RealBot.Trajectory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import rc.CastrooOrnelas.io.*;
+import rc.CastrooOrnelas.test.testing;
+import rc.CastrooOrnelas.user.URLWindow;
 
 import java.awt.geom.Point2D;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends Application {
 
@@ -26,5 +35,53 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
 
+
+/*
+        try {
+            RSimpleTXTIO io = new RSimpleTXTIO("C:\\Users\\raque\\Pictures\\testingreader.txt",true);
+
+         //   io.write("hey", "apple");
+            io.remove("hey", "pear");
+
+            HashMap<String, String[]> values = io.getValues();
+            for(String key:values.keySet()){
+                String keyvalues[] = values.get(key);
+                for(String s: keyvalues){
+                    System.out.println(key + "-:-"+s+"END");
+                }
+            }
+
+
+        } catch (FileNotFoundException e) {
+            System.out.print("WRA");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.print("WRB");
+            e.printStackTrace();
+        }
+*/
+
+
+/*        *//*try {
+            RANWriter<String> ranWriter = new RANWriter<>("C:\\Users\\raque\\Music\\test\\testing.java", (obj)->{
+                String[] strings = {obj, "FFF"};
+                return strings;
+            });
+            ArrayList<String> arrayList = new ArrayList<>();
+            arrayList.add("HELLO");
+            arrayList.add("YO");
+            arrayList.add("NICE");
+            ranWriter.write(arrayList);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+*//*
+        RANReader<String> ranReader = new RANReader<>((objects)->{
+            return (String) objects[0];
+        });
+        ArrayList<String> strings = ranReader.read(testing.objects);
+        strings.stream().forEach((str) ->{
+            System.out.println(str);
+        } );*/
     }
 }

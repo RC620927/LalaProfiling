@@ -46,12 +46,16 @@ public class RealBotView extends Canvas {
         if(robotImage!=null){
             this.robotImage= new Image(robotImageURL);
             this.adjustedRobotImage = new Image(robotImageURL,inToPx * realBotBuilder.getBotWidth(),
-                    inToPx * realBotBuilder.getBotHeight(), false, false);
+                    inToPx * realBotBuilder.getBotLength(), false, false);
         }else{
             this.robotImage = new Image("RobotPicture.png");
             this.adjustedRobotImage = new Image("RobotPicture.png", inToPx * realBotBuilder.getBotWidth(),
-                    inToPx * realBotBuilder.getBotHeight(), false, false);
+                    inToPx * realBotBuilder.getBotLength(), false, false);
         }
+        realBotBuilder.addChangeListener((old, current)->{
+            reset();
+        });
+
         gc=this.getGraphicsContext2D();
         scrollX = new SimpleDoubleProperty(0);
         scrollY = new SimpleDoubleProperty(0);
@@ -66,6 +70,10 @@ public class RealBotView extends Canvas {
         zoom.addListener((obs,o,n) ->{
             if (shouldUpdate()) {draw();}
         });
+
+        //reset realbot so that it is at starting point
+        rb.reset(realBotBuilder.getStartingPoint().getX(),
+                realBotBuilder.getStartingPoint().getY(),realBotBuilder.getStartingAngle());
     }
 
 
@@ -99,7 +107,7 @@ public class RealBotView extends Canvas {
     }
 
     boolean drawing = false;
-    boolean centered = true;
+    boolean centered = false;
     //draw on the canvas the field, waypoints, and the robot, applying a transform to zoom in the process.
     private void draw(){
         if(!drawing){
@@ -122,7 +130,7 @@ public class RealBotView extends Canvas {
 
     //draws, but public. To be used externally scarcely to draw the first iteration
     public void reset(){
-        draw();
+        if(shouldUpdate()) draw();
     }
 
     private Trajectory outlinedTrajectory = null;
@@ -200,10 +208,12 @@ public class RealBotView extends Canvas {
 
     //center the screen on the robot
     public void centerOnRobot(){
-        double currentScreenCenterX = this.getWidth()/2;
-        double currentScreenCentery = this.getHeight()/2;
+        double viewerWidth = this.getWidth() ==0? 1030:this.getWidth();
+        double viewerHeight =this.getHeight() ==0?678:this.getHeight();
+        double currentScreenCenterX = viewerWidth/2;
+        double currentScreenCentery = viewerHeight/2;
         scrollX.setValue(-(currentScreenCenterX/inToPx) + rb.currentX);
-        scrollY.setValue((-(currentScreenCentery/inToPx)  - rb.currentY + this.getLayoutBounds().getHeight() ));
+        scrollY.setValue((-(currentScreenCentery/inToPx)  - rb.currentY + viewerHeight ));
     }
 
     //draws the robot based on the realbot values provided
@@ -211,10 +221,10 @@ public class RealBotView extends Canvas {
         double centerX = getRealX(rb.currentX);
         double centerY = getRealY(rb.currentY);
         double adjustedX = getRealX(rb.currentX -rb.botWidth/2);
-        double adjustedY = getRealY(rb.currentY +realBotBuilder.getBotHeight()/2);
+        double adjustedY = getRealY(rb.currentY +realBotBuilder.getBotLength()/2);
 
         gc.save();
-        Rotate r = new Rotate(rb.currentTheta, adjustedX + rb.botWidth , adjustedY + realBotBuilder.getBotHeight());
+        Rotate r = new Rotate(rb.currentTheta, adjustedX + rb.botWidth , adjustedY + realBotBuilder.getBotLength());
         gc.transform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
         gc.drawImage(adjustedRobotImage, adjustedX, adjustedY);
 
