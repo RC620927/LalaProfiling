@@ -16,7 +16,6 @@ public class StillTrajectory implements Trajectory {
     private Path path;
     private double time;
 
-
     private ArrayList<Moment> moments;
 
     public ArrayList<Moment> getMoments(){
@@ -51,6 +50,11 @@ public class StillTrajectory implements Trajectory {
             }
         }
 
+    }
+
+    @Override
+    public double getTotalTime() {
+        return time;
     }
 }
 

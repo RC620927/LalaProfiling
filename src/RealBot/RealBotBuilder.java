@@ -1,9 +1,12 @@
 package RealBot;
 
+import Lalaprofiling.Application.Snapshot;
+import Lalaprofiling.Application.StillMovement;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import rc.CastrooOrnelas.FRC.TrajectoryIO;
 import rc.CastrooOrnelas.datatypes.RList;
 import rc.CastrooOrnelas.datatypes.RObservable;
-import sample.*;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -31,8 +34,8 @@ public class RealBotBuilder implements RObservable<ArrayList<Trajectory>>{
     private RealBotList realBotList;
     private RealBot realBot;
 
-    private double randomness=0, difficulty=0, totalTime=0;
-
+    private double totalTime=0;
+    private DoubleProperty randomness = new SimpleDoubleProperty(0);
 
     private ArrayList<Trajectory> trajectories;
 
@@ -141,6 +144,7 @@ public class RealBotBuilder implements RObservable<ArrayList<Trajectory>>{
 
     public synchronized void updateTrajectories(){
         ArrayList<Trajectory> cached = trajectories;
+        totalTime=0;
         trajectories = new ArrayList<>();
         int i=0;
         for(RObservableMovement rom: getMovements().getItems()){
@@ -158,15 +162,18 @@ public class RealBotBuilder implements RObservable<ArrayList<Trajectory>>{
             }
             if(rom.getMovementType() == RObservableMovement.MovementType.ROTATE){
                 Trajectory t = new RotateTrajectory(p,rom.getTopSpeed(),acceleration, stopAcceleration);
+                totalTime+=t.getTotalTime();
                 trajectories.add(t);
             }else if(rom.getMovementType() == RObservableMovement.MovementType.LINE ||
                     rom.getMovementType() == RObservableMovement.MovementType.BEZIERCURVE ||
                     rom.getMovementType() == RObservableMovement.MovementType.QUARTICBEZIERCURVE){
                 Trajectory t = new StandardTrajectory(p, rom.getInitialSpeed(),
                         rom.getTopSpeed(),rom.getEndingSpeed(),acceleration,stopAcceleration);
+                totalTime+=t.getTotalTime();
                 trajectories.add(t);
             }else if(rom.getMovementType() == RObservableMovement.MovementType.STILL){
-               Trajectory t = new StillTrajectory(p,((StillMovement) rom.getMovement()).getTime());
+                Trajectory t = new StillTrajectory(p,((StillMovement) rom.getMovement()).getTime());
+                totalTime+=t.getTotalTime();
                 trajectories.add(t);
             }
 
@@ -178,6 +185,7 @@ public class RealBotBuilder implements RObservable<ArrayList<Trajectory>>{
         for(int i=0;i<this.getMovements().getItems().size()-1;i++){
             updateMovementStarts(i);
         }
+        updateTrajectories();
     }
 
     public Point2D getStartingPoint() {
@@ -233,15 +241,15 @@ public class RealBotBuilder implements RObservable<ArrayList<Trajectory>>{
     }
 
     public double getRandomness() {
-        return randomness;
+        return randomness.getValue();
     }
 
     public void setRandomness(double randomness) {
-        this.randomness = randomness;
+        this.randomness.set(randomness);
     }
 
-    public double getDifficulty() {
-        return difficulty;
+    public DoubleProperty randomnessProperty(){
+        return randomness;
     }
 
     public double getAcceleration() {

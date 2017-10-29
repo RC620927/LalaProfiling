@@ -24,10 +24,11 @@ public class RLoop {
             double currentStartTime = System.currentTimeMillis();
             while(shouldRun){
                 running=true;
+                currentStartTime= System.currentTimeMillis();
                 runnable.run();
                 delay = (long) Math.max(0,System.currentTimeMillis() - currentStartTime);
                 try {
-                    Thread.sleep(delay);
+                    Thread.sleep(Math.max(1,millisWaitTime - delay));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

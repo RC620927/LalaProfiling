@@ -1,11 +1,5 @@
 package RealBot;
 
-import sample.MockBot;
-import sample.MockBotBuild;
-import sample.Snapshot;
-
-import java.util.ArrayList;
-
 /**
  * Created by raque on 8/24/2017.
  */

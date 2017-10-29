@@ -53,8 +53,17 @@ public class TrajectoryIO {
     public Trajectory readTrajectory(int sheet){
         ArrayList<Moment> moments = excelReader.read(workbook.getSheetAt(sheet));
 
-        Trajectory t = ()->{
-            return moments;
+
+        Trajectory t = new Trajectory() {
+            @Override
+            public ArrayList<Moment> getMoments() {
+                return moments;
+            }
+
+            @Override
+            public double getTotalTime() {
+                return moments.get(moments.size()-1).timeStamp;
+            }
         };
 
         return t;

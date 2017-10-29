@@ -1,12 +1,10 @@
 package RealBot;
 
-import rc.CastrooOrnelas.datatypes.RList;
-import sample.Resources;
-import sample.Snapshot;
+import Lalaprofiling.Application.Resources;
+import Lalaprofiling.Application.Snapshot;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by raque on 8/25/2017.

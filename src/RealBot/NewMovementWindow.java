@@ -10,8 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import sample.MockBot;
-import sample.MockBotBuild;
 
 import java.awt.geom.Point2D;
 

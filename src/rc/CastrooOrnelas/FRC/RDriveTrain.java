@@ -1,7 +1,7 @@
 package rc.CastrooOrnelas.FRC;
 
 import rc.CastrooOrnelas.controls.RPID;
-import sample.Resources;
+import Lalaprofiling.Application.Resources;
 
 import java.util.function.Supplier;
 

@@ -1,7 +1,7 @@
 package RealBot;
 
+import Lalaprofiling.Application.*;
 import rc.CastrooOrnelas.datatypes.RObservable;
-import sample.*;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

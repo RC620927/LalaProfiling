@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
@@ -7,11 +8,30 @@
 
 <fx:root prefHeight="660" prefWidth="170" styleClass="sidestyle" stylesheets="@RealBotStyleSheet.css" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox fx:id="movementsVBox" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #cdcdcd;" VBox.vgrow="NEVER">
-         <VBox.margin>
-            <Insets left="5.0" right="5.0" top="5.0" />
-         </VBox.margin></VBox>
-      <HBox prefWidth="170.0" spacing="20.0">
+      <HBox>
+         <children>
+            <VBox fx:id="movementsVBox" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #cdcdcd;" HBox.hgrow="ALWAYS" VBox.vgrow="NEVER">
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </VBox>
+            <VBox prefHeight="199.0" prefWidth="57.0">
+               <children>
+                  <Button fx:id="upButton" mnemonicParsing="false" prefWidth="15.0" text="^">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="downButton" mnemonicParsing="false" prefWidth="21.0" text="v" textAlignment="CENTER" textOverrun="CLIP">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox prefWidth="170.0" spacing="1.0">
          <children>
             <Button fx:id="newButton" mnemonicParsing="false" prefWidth="63.0" text="New" />
             <Button fx:id="deleteButton" mnemonicParsing="false" prefWidth="63.0" text="Delete" />

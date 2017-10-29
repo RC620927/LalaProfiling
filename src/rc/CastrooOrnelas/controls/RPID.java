@@ -1,6 +1,6 @@
 package rc.CastrooOrnelas.controls;
 
-import sample.Resources;
+import Lalaprofiling.Application.Resources;
 
 /**
  * Created by raque on 8/31/2017.

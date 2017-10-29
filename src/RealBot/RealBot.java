@@ -13,6 +13,7 @@ public class RealBot extends Rectangle{
     RealBotBuilder rbb;
     double botWidth;
     RealBot instance;
+    double currentDifficulty=0;
 
     RPID anglePID;
 
@@ -55,6 +56,8 @@ public class RealBot extends Rectangle{
     double past2Wanted =currentTheta;
     double past3Wanted = currentTheta;
     boolean playing =false;
+    double difficulty=0;
+    int difficultyPoints=0;
     public void play(Trajectory t){
         this.t=t;
 
@@ -65,7 +68,6 @@ public class RealBot extends Rectangle{
             Runnable go = new Runnable() {
                 @Override
                 public void run() {
-
                     currentTime=0;
                     for(Moment m: t.getMoments()){
                         long timeWait = (long)(1000* (m.timeStamp-currentTime));
@@ -112,15 +114,23 @@ public class RealBot extends Rectangle{
                         System.out.println(m.timeStamp +":   WX:"+m.x+ "    WY:" +m.y+"    WTH:" + m.angle+"    WLVEL:" + m.lVel+"    WRVEL:" + m.rVel);
                         System.out.println(m.timeStamp +":   X:"+ currentX + "   Y:" + currentY  + "   TH:" + currentTheta + "   XOFF:" +(currentX-m.x));
                         System.out.println(m.timeStamp +":   DelD:"+ delD + "    leftV:" + leftVel + "    RightV:" + rightVel + "    PID:" + anglePIDOutput);
+                        double distaneToWanted = Math.hypot(currentX-m.x, currentY-m.y);
+                        difficulty+=distaneToWanted;
+                        difficultyPoints++;
                     }
                     playing=false;
                 }
             };
            new Thread(go).start();
         }
-
     }
 
+    public void resetDifficulty(){
+        difficulty=0;
+        difficultyPoints=0;
+    }
 
-
+    public double getAvgDifficulty() {
+        return difficulty/ (double) difficultyPoints;
+    }
 }

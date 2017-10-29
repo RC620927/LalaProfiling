@@ -3,7 +3,6 @@ package RealBot;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import sample.Resources;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,7 +19,7 @@ public class RotateTrajectory implements Trajectory {
     private double initialLeftSpeed, initialRightSpeed, topSpeed, endingSpeed;
     private double maxAcceleration, maxStopAcceleration;
 
-
+    private double totalTime=0;
 
     private ArrayList<Moment> moments;
 
@@ -124,7 +123,7 @@ public class RotateTrajectory implements Trajectory {
                 if( !(deAccelerate==true &&
                         ((pastVelocity>=endingSpeed && currentVelocity<= endingSpeed && !currentSnapshot.isReverse())
                                 || (pastVelocity<=endingSpeed && currentVelocity>= endingSpeed && currentSnapshot.isReverse()) ))){
-
+                    totalTime=i*delT;
                     moments.add(new Moment("",i * delT,currentSnapshot.getS().x, currentSnapshot.getS().y,
                             currentSnapshot.getS().angle,leftVelocity,rightVelocity));
 
@@ -148,4 +147,8 @@ public class RotateTrajectory implements Trajectory {
 
     }
 
+    @Override
+    public double getTotalTime() {
+        return totalTime;
+    }
 }

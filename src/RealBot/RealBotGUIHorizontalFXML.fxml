@@ -78,7 +78,7 @@
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Region prefHeight="200.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                        <Slider fx:id="randomnessSlider" majorTickUnit="30.0" min="10.0" showTickLabels="true" styleClass="small_letters">
+                        <Slider fx:id="randomnessSlider" blockIncrement="1.0" majorTickUnit="30.0" min="10.0" showTickLabels="true" styleClass="small_letters">
                            <padding>
                               <Insets top="8.0" />
                            </padding>
@@ -127,11 +127,7 @@
                   <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Region prefHeight="40.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-                        <Label fx:id="difficultyLabel" styleClass="big_letters" text="1.0">
-                           <font>
-                              <Font size="20.0" />
-                           </font>
-                        </Label>
+                        <Label fx:id="difficultyLabel" styleClass="big_letters" text="Label" />
                      </children>
                   </HBox>
                </children>

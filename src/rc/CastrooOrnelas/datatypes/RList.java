@@ -49,6 +49,14 @@ public class RList<type> implements  RObservable<RList<type>>{
         }
     }
 
+    public synchronized void add(int index, type item){
+        RList<type> cached = this;
+        itemsArrayList.add(index, item);
+        for(BiConsumer dc: changeListeners){
+            dc.accept(cached,this);
+        }
+    }
+
     public synchronized void add(RList<type> otherList){
         RList<type> cached = otherList;
         for(type item : otherList.getItems()){
