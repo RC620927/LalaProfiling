@@ -1,0 +1,39 @@
+/*
+    color palette 2280
+    dark   #343d46 - foreground
+    reg    #4f5b66 - headings
+    med    #65737e - side
+    light  #a7adba - background
+    exlight#c0c5ce - letters
+    */
+
+
+.big_letters{
+    -fx-font-family: "Segoe UI";
+    -fx-text-fill: #c0c5ce;
+    -fx-font-size:21;
+}
+
+.small_letters{
+    -fx-font-size:15;
+    -fx-font-family: "Segoe UI";
+    -fx-text-fill: #c0c5ce;
+}
+
+
+.foregroundstyle{
+    -fx-background-color: #343d46;
+}
+
+.headingstyle{
+    -fx-background-color: #4f5b66;
+}
+
+.sidestyle{
+    -fx-background-color: #65737e;
+}
+
+.backgroundstyle{
+    -fx-background-color: #a7adba;
+}
+
