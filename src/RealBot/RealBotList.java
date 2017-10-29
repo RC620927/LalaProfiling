@@ -1,8 +1,7 @@
 package RealBot;
 
-import javafx.scene.image.Image;
+import Lalaprofiling.Application.*;
 import rc.CastrooOrnelas.datatypes.RList;
-import sample.*;
 
 import java.awt.geom.Point2D;
 
@@ -181,9 +180,6 @@ public class RealBotList extends RList<RObservableMovement>{
         }
     }
 
-
-
-
     private void addMovement(String name, Movement movement,
                              RObservableMovement.MovementType movementType, double initialSpeed, double topSpeed, double endingSpeed){
         RObservableMovement rom = new RObservableMovement(name, movement, movementType,
@@ -193,6 +189,21 @@ public class RealBotList extends RList<RObservableMovement>{
     }
 
     public void removeMovement(RObservableMovement m){
+        this.remove(m);
+        realBotBuilder.updateAll();
+    }
 
+    public void moveMovement(RObservableMovement m, int index){
+        if(this.getItems().contains(m)){
+            this.remove(m);
+            this.add(index, m);
+            realBotBuilder.updateAll();
+        }
     }
 }
+
+
+
+
+
+

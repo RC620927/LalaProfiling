@@ -1,12 +1,7 @@
 package RealBot;
 
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import sample.Resources;
+import Lalaprofiling.Application.Resources;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +16,7 @@ public class StandardTrajectory implements Trajectory{
     private double initialSpeed, topSpeed, endingSpeed;
     private double maxAcceleration, maxStopAcceleration;
 
-
+    private double totalTime=0;
 
     private ArrayList<Moment> moments;
 
@@ -39,7 +34,7 @@ public class StandardTrajectory implements Trajectory{
         this.maxStopAcceleration = maxStopAcceleration;
         update();
         int x =1;
-        try {
+/*        try {
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet spreadsheet = workbook.createSheet("1");
 
@@ -50,13 +45,13 @@ public class StandardTrajectory implements Trajectory{
                 currentRow = spreadsheet.createRow(index++);
                 currentRow.createCell(0).setCellValue(index * (1 / refreshRate));
                 currentRow.createCell(1).setCellValue(m.lVel);
-                currentRow.createCell(2).setCellValue(m.rVel);/*
+                currentRow.createCell(2).setCellValue(m.rVel);*//*
                 currentRow.createCell(3).setCellValue(m.sss.getS().angle);
                 currentRow.createCell(4).setCellValue(m.sss.getRightWheelSnapshot().x);
                 currentRow.createCell(5).setCellValue(m.sss.getRightWheelSnapshot().y);
 
                 currentRow.createCell(7).setCellValue(m.sss.getLeftWheelSnapshot().x);
-                currentRow.createCell(8).setCellValue(m.sss.getLeftWheelSnapshot().y);*/
+                currentRow.createCell(8).setCellValue(m.sss.getLeftWheelSnapshot().y);*//*
             }
             FileOutputStream out = new FileOutputStream(
                     new File("Graph.xlsx"));
@@ -65,7 +60,7 @@ public class StandardTrajectory implements Trajectory{
             out.close();
         }catch(Exception e){
 
-        }
+        }*/
 
     }
 
@@ -156,7 +151,7 @@ public class StandardTrajectory implements Trajectory{
                 if( !(deAccelerate==true &&
                         ((pastVelocity>=endingSpeed && currentVelocity<= endingSpeed && !currentSnapshot.isReverse())
                                 || (pastVelocity<=endingSpeed && currentVelocity>= endingSpeed && currentSnapshot.isReverse()) ))){
-
+                    totalTime=i*delT;
                     moments.add(new Moment("",i * delT,currentSnapshot.getS().x, currentSnapshot.getS().y,
                             currentSnapshot.getS().angle,leftVelocity,rightVelocity));
 
@@ -178,6 +173,11 @@ public class StandardTrajectory implements Trajectory{
             }
         }
 
+    }
+
+    @Override
+    public double getTotalTime() {
+        return totalTime;
     }
 
     /*private void update(){

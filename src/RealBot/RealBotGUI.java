@@ -1,18 +1,8 @@
 package RealBot;
 
-import de.thomasbolz.javafx.NumberSpinner;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.Property;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.control.RadioButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import rc.CastrooOrnelas.controls.RLoop;
-import sample.BezierCurveMovement;
-import sample.Movement;
-
-import java.util.function.BiConsumer;
 
 /**
  * Created by raque on 9/19/2017.
@@ -22,8 +12,8 @@ public class RealBotGUI{
 
     private RLoop loop;
 
-    private VBox mainVLayer;
-    private HBox mainHLayer;
+    private RealBotVerticalGUI mainVLayer;
+    private RealBotHorizontalGUI mainHLayer;
     private RealBotView realBotView;
     private NewMovementWindow newMovementWindow;
     private boolean disabled=false;
@@ -37,8 +27,10 @@ public class RealBotGUI{
         newMovementWindow = new NewMovementWindow(realBotBuilder);
 
         Runnable runnable = ()->{
-            realBotView.reset();
-            ((RealBotHorizontalGUI) mainHLayer).updateGUIValues();
+            if(!disabled){
+                mainHLayer.updateGUIValues();
+                realBotView.reset();
+            }
         };
         loop = new RLoop(runnable, 10);
         startLoop();
@@ -75,9 +67,11 @@ public class RealBotGUI{
 
     public void disable(){
         loop.kill();
+        disabled=true;
     }
 
     public void enable(){
+        disabled=false;
         loop.start();
     }
 }

@@ -1,17 +1,12 @@
 package RealBot;
 
-import de.thomasbolz.javafx.NumberSpinner;
-import javafx.beans.property.Property;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
-import sample.BezierCurveMovement;
-import sample.Movement;
-import sample.StillMovement;
+import Lalaprofiling.Application.Movement;
 
 import java.util.function.BiConsumer;
 
@@ -25,14 +20,15 @@ public class RealBotHorizontalGUI extends HBox{
     private RealBotGUI realBotGUI;
     private RealBotBuilder realBotBuilder;
 
-    @FXML
-    public Label difficultyLabel;
+
     @FXML
     public Slider randomnessSlider;
     @FXML
     public Label topSpeedLabel;
     @FXML
     public Label maxAccelerationLabel;
+    @FXML
+    public Label difficultyLabel;
     @FXML
     public Label totalTimeLabel;
 
@@ -53,23 +49,39 @@ public class RealBotHorizontalGUI extends HBox{
             System.out.println("AADFDSFDFDFD");
             throw new RuntimeException(e);
         }
-        randomnessSlider.valueProperty().addListener((obs,old,current)->{
-            realBotBuilder.setRandomness(current.doubleValue());
+        realBotBuilder.addChangeListener((old,current)->{
             updateGUIValues();
         });
+        randomnessSlider.valueProperty().bindBidirectional(realBotBuilder.randomnessProperty());
+
         runButton.setOnAction(e->{
             realBotGUI.playRobot();
         });
 
     }
 
-
-    synchronized void updateGUIValues(){
+    private double difficulty=0;
+    private double difficultyC = 0;
+    void updateGUIValues(){
         topSpeedLabel.setText("" +realBotBuilder.getTopSpeed());
         maxAccelerationLabel.setText("" + realBotBuilder.getAcceleration());
         totalTimeLabel.setText("" + realBotBuilder.getTotalTime());
-        randomnessSlider.setValue(realBotBuilder.getRandomness());
-        difficultyLabel.setText("" + realBotBuilder.getDifficulty());
+        if(randomnessSlider.valueProperty().getValue()!=difficultyC){
+            difficultyC=difficulty;
+           // difficultyLabel.setText("" + randomnessSlider.valueProperty().getValue().toString());
+        }
+     //   difficulty =20;
+
+        difficulty = Double.valueOf(realBotGUI.getRealBotView().getDifficulty());
+        System.out.println(realBotGUI.toString() + this.toString() + realBotBuilder.toString());
+        System.out.println(realBotGUI.getRealBotView().getDifficulty());
+        randomnessSlider.valueProperty().set(difficulty*30);
+
+        /*        if(realBotBuilder.getDifficulty()!=difficulty){
+            this.difficulty=realBotBuilder.getDifficulty();
+            AL.setText("" + realBotBuilder.getDifficulty());
+        }*/
+
     }
 
 }

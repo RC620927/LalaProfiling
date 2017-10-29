@@ -9,9 +9,9 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import sample.BezierCurveMovement;
-import sample.Movement;
-import sample.StillMovement;
+import Lalaprofiling.Application.BezierCurveMovement;
+import Lalaprofiling.Application.Movement;
+import Lalaprofiling.Application.StillMovement;
 
 import java.util.function.BiConsumer;
 
@@ -50,6 +50,10 @@ public class RealBotVerticalGUI  extends VBox{
     private Button newButton;
     @FXML
     private Button deleteButton;
+    @FXML
+    private Button upButton;
+    @FXML
+    private Button downButton;
 
     private boolean updatingGUIvalues = false;
 
@@ -154,6 +158,23 @@ public class RealBotVerticalGUI  extends VBox{
             realBotBuilder.getMovements().removeMovement(realBotListView.getSelectionModel().getSelectedItem());
         });
 
+/*        upButton.setOnAction(e->{
+            RObservableMovement selected = realBotListView.getSelectionModel().getSelectedItem();
+            if(selected!=null){
+                int indexTo = realBotBuilder.getMovements().getArrayList().indexOf(selected)-1;
+                indexTo = (int) Resources.limit(indexTo,0,realBotBuilder.getMovements().size()-1);
+                realBotBuilder.getMovements().moveMovement(selected, indexTo);
+            }
+        });
+
+        downButton.setOnAction(e->{
+            RObservableMovement selected = realBotListView.getSelectionModel().getSelectedItem();
+            if(selected!=null){
+                int indexTo = realBotBuilder.getMovements().getArrayList().indexOf(selected)+1;
+                indexTo = (int) Resources.limit(indexTo,0,realBotBuilder.getMovements().size()-1);
+                realBotBuilder.getMovements().moveMovement(selected, indexTo);
+            }
+        });*/
 
         movementsVBox.getChildren().add(realBotListView);
         //this.getChildren().add(realBotListView);

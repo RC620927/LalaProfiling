@@ -2,19 +2,12 @@ package RealBot;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
-import sample.Movement;
-import sample.Resources;
 
 /**
  * Created by raque on 8/28/2017.
@@ -25,7 +18,7 @@ public class RealBotView extends Canvas {
     RealBot rb;
     private GraphicsContext gc;
     public DoubleProperty scrollX, scrollY, zoom;
-
+    private double difficulty;
 
     Image robotImage;
     Image adjustedRobotImage;
@@ -161,8 +154,10 @@ public class RealBotView extends Canvas {
             Runnable r = ()->{
                 rb.reset(realBotBuilder.getStartingPoint().getX(),
                         realBotBuilder.getStartingPoint().getY(),realBotBuilder.getStartingAngle());
+                rb.resetDifficulty();
                 for(Trajectory t: realBotBuilder.getTrajectories()){
                     rb.play(t);
+
                     while(rb.playing){
                         if(centered){
                             centerOnRobot();
@@ -175,6 +170,7 @@ public class RealBotView extends Canvas {
                         }
                     }
                 }
+                difficulty=rb.getAvgDifficulty();
                 playing=false;
             };
             new Thread(r).start();
@@ -239,5 +235,8 @@ public class RealBotView extends Canvas {
         gc.strokeRect(getRealX(0),getRealY(628), getRealX(324)-getRealX(0),getRealY(0)-getRealY(628));
     }
 
+    public double getDifficulty(){
+        return difficulty;
+    }
 
 }

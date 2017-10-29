@@ -16,6 +16,7 @@ public class RANWriter<type> {
         public String[] write(k obj);
     }
 
+
     RANRowWriter<type> rowWriter;
     public RANWriter(String url, RANRowWriter<type> rowWriter) throws IOException {
         file = new File(url);

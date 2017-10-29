@@ -1,6 +1,6 @@
 package RealBot;
 
-import sample.Snapshot;
+import Lalaprofiling.Application.Snapshot;
 
 /**
  * Created by raque on 8/24/2017.
